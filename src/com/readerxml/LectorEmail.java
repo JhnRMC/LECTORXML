@@ -28,7 +28,7 @@ public class LectorEmail extends Thread {
     private final static Logger LOGGER = Logger.getLogger("com.readerxml.LectorEmail");
     private final static Logger LOGGER_ARCHIVO = Logger.getLogger("com.readerxml.controller");
     private LectorXML lectorXML;
-    private Properties propiedades;
+    public static Properties propiedades;
     private int cantidadMsgBuzonAnterior;
     private final String PROPERTIES = "config_service_email.properties";
     int cantidadArchivos;
@@ -86,14 +86,14 @@ public class LectorEmail extends Thread {
 
     public void configuracionEmail() {
         try {
-            propiedades = cargarPropiedades(PROPERTIES);
-            cantidadMsgBuzonAnterior = Integer.parseInt(propiedades.getProperty("cantidad.msg.buzon.leidos"));
+            LectorEmail.propiedades = cargarPropiedades(PROPERTIES);
+            cantidadMsgBuzonAnterior = Integer.parseInt(LectorEmail.propiedades.getProperty("cantidad.msg.buzon.leidos"));
             try {
-                Session session = Session.getInstance(propiedades);
-                Store store = session.getStore(propiedades.getProperty("protocolo.correo"));
-                store.connect(propiedades.getProperty("host.name"),
-                        propiedades.getProperty("usuario.correo"),
-                        propiedades.getProperty("password.correo"));
+                Session session = Session.getInstance(LectorEmail.propiedades);
+                Store store = session.getStore(LectorEmail.propiedades.getProperty("protocolo.correo"));
+                store.connect(LectorEmail.propiedades.getProperty("host.name"),
+                        LectorEmail.propiedades.getProperty("usuario.correo"),
+                        LectorEmail.propiedades.getProperty("password.correo"));
 
                 Folder inbox = store.getFolder("INBOX");
                 inbox.open(Folder.READ_ONLY);
@@ -121,7 +121,7 @@ public class LectorEmail extends Thread {
             for (int i = cantidadMsgBuzonAnterior; i <= cantidadMsgBuzonActual; i++) {
                 LectorEmail.email = obtenerCorrero(messages[i].getFrom()[0].toString());
                 verificacionEnvio = true;
-                if (!LectorEmail.email.equalsIgnoreCase(propiedades.getProperty("usuario.correo"))) {
+                if (!LectorEmail.email.equalsIgnoreCase(LectorEmail.propiedades.getProperty("usuario.correo"))) {
                     Date sentDate = messages[i].getSentDate();
                     LectorEmail.flag = sentDate.getYear() + "-" + sentDate.getMonth() + "-" + sentDate.getMinutes() + "-" + sentDate.getTime();
                     LectorEmail.asunto = messages[i].getSubject();
@@ -178,8 +178,8 @@ public class LectorEmail extends Thread {
     }
 
     public void escribirPropiedad(String property, String value) throws IOException {
-        propiedades.setProperty(property, value);
-        propiedades.store(new FileOutputStream(PROPERTIES), "cantidad de correos anteriores leidos - default 21212 - primer documento registrado fecha 25/02/19");
+        LectorEmail.propiedades.setProperty(property, value);
+        LectorEmail.propiedades.store(new FileOutputStream(PROPERTIES), "cantidad de correos anteriores leidos - default 21212 - primer documento registrado fecha 25/02/19");
     }
 
     private void avisoRegistro() {

@@ -3,3 +3,4 @@ build/
 bitacora.*
 ReaderXML/src/com/readerxml/conexion/*
 config_service_email.*
+*.rar

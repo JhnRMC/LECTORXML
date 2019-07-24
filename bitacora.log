@@ -1,66 +1,46 @@
-jul 24, 2019 2:51:20 PM com.readerxml.controller.LectorXML registrarAviso
-ADVERTENCIA: REGISTRO EXITOSO, PARA EL ENVIO DE CORREO
-jul 24, 2019 2:51:20 PM com.readerxml.LectorEmail lecturaBuzon
-ADVERTENCIA: SOLO SE ACEPTAN EMAIL CON DOS ARCHIVOS ADJUNTOS, XML Y PDF
-jul 24, 2019 2:51:33 PM com.readerxml.controller.LectorXML registrarAviso
-ADVERTENCIA: REGISTRO EXITOSO, PARA EL ENVIO DE CORREO
-jul 24, 2019 2:51:33 PM com.readerxml.LectorEmail lecturaBuzon
-ADVERTENCIA: SOLO SE ACEPTAN EMAIL CON DOS ARCHIVOS ADJUNTOS, XML Y PDF
-jul 24, 2019 2:51:43 PM com.readerxml.controller.LectorXML registrarAviso
-ADVERTENCIA: REGISTRO EXITOSO, PARA EL ENVIO DE CORREO
-jul 24, 2019 2:51:43 PM com.readerxml.LectorEmail lecturaBuzon
-ADVERTENCIA: SOLO SE ACEPTAN EMAIL CON DOS ARCHIVOS ADJUNTOS, XML Y PDF
-jul 24, 2019 2:51:44 PM com.readerxml.controller.LectorXML registrarAviso
-ADVERTENCIA: REGISTRO EXITOSO, PARA EL ENVIO DE CORREO
-jul 24, 2019 2:51:44 PM com.readerxml.LectorEmail lecturaBuzon
-ADVERTENCIA: SOLO SE ACEPTAN EMAIL CON DOS ARCHIVOS ADJUNTOS, XML Y PDF
-jul 24, 2019 2:51:46 PM com.readerxml.controller.LectorXML registrarAviso
-ADVERTENCIA: REGISTRO EXITOSO, PARA EL ENVIO DE CORREO
-jul 24, 2019 2:51:46 PM com.readerxml.LectorEmail lecturaBuzon
-ADVERTENCIA: SOLO SE ACEPTAN EMAIL CON DOS ARCHIVOS ADJUNTOS, XML Y PDF
-jul 24, 2019 2:51:57 PM com.readerxml.controller.Xml getNumeroDocumentoReceptor
+jul 24, 2019 3:32:32 PM com.readerxml.controller.Xml getNumeroDocumentoReceptor
 ADVERTENCIA: EL XML NO CUENTA CON LA ETIQUETA '<NUMERO DE DOCUMENTO RECEPTOR>'
-jul 24, 2019 2:51:57 PM com.readerxml.controller.LectorXML registrarError
+jul 24, 2019 3:32:33 PM com.readerxml.controller.LectorXML registrarError
 ADVERTENCIA: REGISTRO EXITOSO, PARA EL ENVIO DE CORREO
-jul 24, 2019 2:51:57 PM com.readerxml.controller.LectorXML registrarErrorLog
+jul 24, 2019 3:32:33 PM com.readerxml.controller.LectorXML registrarErrorLog
 ADVERTENCIA: tci-pos-movil@tci.net.pe
-jul 24, 2019 2:51:57 PM com.readerxml.controller.LectorXML registrarErrorLog
+jul 24, 2019 3:32:33 PM com.readerxml.controller.LectorXML registrarErrorLog
 ADVERTENCIA: Comprobante Emitido
-jul 24, 2019 2:51:57 PM com.readerxml.controller.LectorXML registrarErrorLog
+jul 24, 2019 3:32:33 PM com.readerxml.controller.LectorXML registrarErrorLog
 ADVERTENCIA: 24/07/2019 12:16:25 PM
-jul 24, 2019 2:51:57 PM com.readerxml.controller.LectorXML registrarErrorLog
+jul 24, 2019 3:32:33 PM com.readerxml.controller.LectorXML registrarErrorLog
 ADVERTENCIA: *********************
-jul 24, 2019 2:51:59 PM com.readerxml.controller.Xml getPrecioProducto
+jul 24, 2019 3:32:34 PM com.readerxml.controller.Xml getPrecioProducto
 ADVERTENCIA: EL XML NO CUENTA CON LA ETIQUETA '<PRECIO>'
-jul 24, 2019 2:51:59 PM com.readerxml.controller.LectorXML registrarAviso
+jul 24, 2019 3:32:34 PM com.readerxml.controller.LectorXML registrarAviso
 ADVERTENCIA: REGISTRO EXITOSO, PARA EL ENVIO DE CORREO
-jul 24, 2019 2:51:59 PM com.readerxml.LectorEmail lecturaBuzon
+jul 24, 2019 3:32:34 PM com.readerxml.LectorEmail lecturaBuzon
 GRAVE: NO SE PUDO RECUPERAR EL XML ADJUNTO EN EL BUZON: ( REALIZAR NUEVO ADJUNTO DE ARCHIVOS )
-jul 24, 2019 2:52:00 PM com.readerxml.controller.LectorXML registrarAviso
+jul 24, 2019 3:32:36 PM com.readerxml.controller.LectorXML registrarAviso
 ADVERTENCIA: REGISTRO EXITOSO, PARA EL ENVIO DE CORREO
-jul 24, 2019 2:52:00 PM com.readerxml.LectorEmail lecturaBuzon
+jul 24, 2019 3:32:36 PM com.readerxml.LectorEmail lecturaBuzon
 ADVERTENCIA: SOLO SE ACEPTAN EMAIL CON DOS ARCHIVOS ADJUNTOS, XML Y PDF
-jul 24, 2019 2:52:04 PM com.readerxml.controller.LectorXML registrarAviso
+jul 24, 2019 3:32:40 PM com.readerxml.controller.LectorXML registrarAviso
 ADVERTENCIA: REGISTRO EXITOSO, PARA EL ENVIO DE CORREO
-jul 24, 2019 2:52:04 PM com.readerxml.LectorEmail lecturaBuzon
+jul 24, 2019 3:32:40 PM com.readerxml.LectorEmail lecturaBuzon
 ADVERTENCIA: SOLO SE ACEPTAN EMAIL CON DOS ARCHIVOS ADJUNTOS, XML Y PDF
-jul 24, 2019 2:52:11 PM com.readerxml.controller.LectorXML registrarAviso
+jul 24, 2019 3:32:47 PM com.readerxml.controller.LectorXML registrarAviso
 ADVERTENCIA: REGISTRO EXITOSO, PARA EL ENVIO DE CORREO
-jul 24, 2019 2:52:11 PM com.readerxml.LectorEmail lecturaBuzon
+jul 24, 2019 3:32:47 PM com.readerxml.LectorEmail lecturaBuzon
 ADVERTENCIA: SOLO SE ACEPTAN EMAIL CON DOS ARCHIVOS ADJUNTOS, XML Y PDF
-jul 24, 2019 2:52:22 PM com.readerxml.controller.LectorXML registrarAviso
+jul 24, 2019 3:32:56 PM com.readerxml.controller.LectorXML registrarAviso
 ADVERTENCIA: REGISTRO EXITOSO, PARA EL ENVIO DE CORREO
-jul 24, 2019 2:52:22 PM com.readerxml.LectorEmail lecturaBuzon
+jul 24, 2019 3:32:56 PM com.readerxml.LectorEmail lecturaBuzon
 ADVERTENCIA: SOLO SE ACEPTAN EMAIL CON DOS ARCHIVOS ADJUNTOS, XML Y PDF
-jul 24, 2019 2:53:46 PM com.readerxml.controller.LectorXML registrarAviso
+jul 24, 2019 3:33:36 PM com.readerxml.controller.LectorXML registrarAviso
 ADVERTENCIA: REGISTRO EXITOSO, PARA EL ENVIO DE CORREO
-jul 24, 2019 2:53:46 PM com.readerxml.LectorEmail lecturaBuzon
+jul 24, 2019 3:33:36 PM com.readerxml.LectorEmail lecturaBuzon
 ADVERTENCIA: SOLO SE ACEPTAN EMAIL CON DOS ARCHIVOS ADJUNTOS, XML Y PDF
-jul 24, 2019 2:53:48 PM com.readerxml.controller.LectorXML registrarAviso
+jul 24, 2019 3:33:39 PM com.readerxml.controller.LectorXML registrarAviso
 ADVERTENCIA: REGISTRO EXITOSO, PARA EL ENVIO DE CORREO
-jul 24, 2019 2:53:48 PM com.readerxml.LectorEmail lecturaBuzon
+jul 24, 2019 3:33:39 PM com.readerxml.LectorEmail lecturaBuzon
 ADVERTENCIA: SOLO SE ACEPTAN EMAIL CON DOS ARCHIVOS ADJUNTOS, XML Y PDF
-jul 24, 2019 2:53:50 PM com.readerxml.controller.LectorXML registrarAviso
+jul 24, 2019 3:33:41 PM com.readerxml.controller.LectorXML registrarAviso
 ADVERTENCIA: REGISTRO EXITOSO, PARA EL ENVIO DE CORREO
-jul 24, 2019 2:53:50 PM com.readerxml.LectorEmail lecturaBuzon
+jul 24, 2019 3:33:41 PM com.readerxml.LectorEmail lecturaBuzon
 ADVERTENCIA: SOLO SE ACEPTAN EMAIL CON DOS ARCHIVOS ADJUNTOS, XML Y PDF
