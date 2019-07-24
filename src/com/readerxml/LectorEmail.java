@@ -38,6 +38,7 @@ public class LectorEmail extends Thread {
     public static String fecha;
     private static LectorEmail lectorEmail;
     private boolean verificacionEnvio = true;
+    private boolean existeXML;
 
     public static void main(String[] args) {
         lectorEmail = new LectorEmail();
@@ -139,24 +140,13 @@ public class LectorEmail extends Thread {
                             Multipart archivosAdjuntos = (Multipart) messages[i].getContent();
                             cantidadArchivos = archivosAdjuntos.getCount() - 1;
                             if (cantidadArchivos == 2) {
-                                for (int j = 1; j <= cantidadArchivos; j++) {
-                                    Part archivoAdjuntoXML = archivosAdjuntos.getBodyPart(j);
-                                    String nombreArchivoXML = archivoAdjuntoXML.getFileName().toLowerCase();
-                                    System.out.println("Contenido: [" + j + "]" + nombreArchivoXML);
-
-                                    if (nombreArchivoXML.endsWith(".xml")) {
-                                        lectorXML.iniciarLectura(archivoAdjuntoXML);
-                                    } else if (nombreArchivoXML.endsWith(".pdf") && !LectorXML.existe) {
-                                        Archivo.guardarPDF(archivoAdjuntoXML, lectorXML.documento.getPathPDF());
-                                    }
-                                }
+                                leer(archivosAdjuntos);
                             } else {
                                 avisoRegistro();
                                 LOGGER.log(Level.WARNING, "SOLO SE ACEPTAN EMAIL CON DOS ARCHIVOS ADJUNTOS, XML Y PDF");
                             }
                         }
                     } catch (NullPointerException FILE_NOFOUND) {
-                        FILE_NOFOUND.printStackTrace();
                         avisoRegistro();
                         LOGGER.log(Level.SEVERE, "NO SE PUDO RECUPERAR EL XML ADJUNTO EN EL BUZON: ( REALIZAR NUEVO ADJUNTO DE ARCHIVOS )");
                     }
@@ -167,7 +157,7 @@ public class LectorEmail extends Thread {
         } catch (IOException error_content) {
             LOGGER.log(Level.SEVERE, "ERROR EN EL CONTENIDO");
         } catch (MessagingException ex) {
-
+            LOGGER.log(Level.SEVERE, "ERROR EN LECTURA DEL ARCHIVO ADJUNTO DEL CORREO{0}", LectorEmail.getStackTrace(ex));
         } catch (ArrayIndexOutOfBoundsException indexEx) {
             if (verificacionEnvio) {
                 LOGGER.log(Level.INFO, "A LA ESPERA DE NUEVOS CORREOS...");
@@ -200,5 +190,35 @@ public class LectorEmail extends Thread {
         Xml.estado = false;
         lectorXML.registrarAviso(Xml.ERROR_AVISO);
         LOGGER.log(Level.CONFIG, "***********");
+    }
+
+    private void leer(Multipart archivosAdjuntos) throws MessagingException {
+        Part archivoAdjunto;
+        String nombreArchivo;
+        for (int i = 1; i <= cantidadArchivos; i++) {
+            archivoAdjunto = archivosAdjuntos.getBodyPart(i);
+            nombreArchivo = archivoAdjunto.getFileName().toLowerCase();
+
+            if (nombreArchivo.endsWith(".xml")) {
+                System.out.println("Contenido: [" + i + "]" + nombreArchivo);
+                lectorXML.iniciarLectura(archivoAdjunto);
+                existeXML = true;
+            }
+        }
+
+        for (int j = 1; j <= cantidadArchivos; j++) {
+            archivoAdjunto = archivosAdjuntos.getBodyPart(j);
+            nombreArchivo = archivoAdjunto.getFileName().toLowerCase();
+
+            if (nombreArchivo.endsWith(".pdf") && !LectorXML.existe) {
+                System.out.println("Contenido: [" + j + "]" + nombreArchivo);
+                Archivo.guardarPDF(archivoAdjunto, lectorXML.documento.getPathPDF());
+            }
+        }
+        
+        if (!existeXML) {
+            LOGGER.log(Level.WARNING, "NO SE ENCONTRO EL XML ENTRE LOS ARCHIVOS, O SE ENCUENTRA DENTRO DE UN ARCHIVO COMPRIMIDO (ZIP, RAR, 7Z)");
+            avisoRegistro();
+        }
     }
 }

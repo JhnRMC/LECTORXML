@@ -22,8 +22,8 @@ import com.readerxml.LectorEmail;
 import com.readerxml.bean.EmailSend;
 import com.readerxml.bean.Total;
 
-
 public class LectorXML extends Xml {
+
     private final static Logger LOGGER = Logger.getLogger("com.readerxml.controller.LectorXML");
     private static LectorXML lectorXML;
     public Documento documento;
@@ -62,7 +62,7 @@ public class LectorXML extends Xml {
             detalle();
             total();
             guardarDocumentoElectronico(archivo);
-        } catch (ParserConfigurationException e){
+        } catch (ParserConfigurationException e) {
             e.printStackTrace();
         } catch (SAXException e) {
             LOGGER.log(Level.SEVERE, "LECTURA NO PERMITIDA: {0}", LectorEmail.getStackTrace(e));
@@ -74,8 +74,8 @@ public class LectorXML extends Xml {
     }
 
     public void guardarDocumentoElectronico(Part archivo) {
-        DocumentoElectronicoDAO documentoElectronicoDAO = new DocumentoElectronicoDAO();       
-        if (!existeDocumento(documentoElectronicoDAO)) { 
+        DocumentoElectronicoDAO documentoElectronicoDAO = new DocumentoElectronicoDAO();
+        if (!existeDocumento(documentoElectronicoDAO)) {
             existe = false;
             generarPath(archivo);
             documento.setCabecera(cabecera);
@@ -87,13 +87,13 @@ public class LectorXML extends Xml {
             } else {
                 documentoElectronicoDAO.insertDocumentoElectronico(documento);
             }
-        }else{
+        } else {
             existe = true;
             LOGGER.log(Level.INFO, "DOCUMENTO EXISTENTE EN LA BD");
         }
     }
-    
-    public boolean existeDocumento(DocumentoElectronicoDAO documentoElectronicoDAO){        
+
+    public boolean existeDocumento(DocumentoElectronicoDAO documentoElectronicoDAO) {
         return documentoElectronicoDAO.verificarDocumentoExistente(cabecera.getSerieDocumento(), cabecera.getCorrelativoDocumento(), cabecera.getNroDocumentoEmis(), cabecera.getTipoDocumento());
     }
 
@@ -129,13 +129,20 @@ public class LectorXML extends Xml {
 
     public void generarPath(Part archivo) {
         String ruta;
+        String ruta_SO;
         String nombreArchivo = null;
+        if (verificarSO()) {
+            ruta_SO = "c:/";
+        } else {
+            ruta_SO = "/";
+        }
+
         if (!Xml.estado) {
-            ruta = "c:/home/error";
+            ruta = ruta_SO + "home/error";
             nombreArchivo = LectorEmail.flag;
         } else {
             nombreArchivo = cabecera.getNroDocumentoEmis() + "-" + cabecera.getCorrelativoDocumento();
-            ruta = "c:/home/proveedores/TD_" + tipoDocumento + "/" + cabecera.getNroDocumentoEmis() + "/" + cabecera.getSerieDocumento() + "-" + cabecera.getCorrelativoDocumento();
+            ruta = ruta_SO + "home/proveedores/TD_" + tipoDocumento + "/" + cabecera.getNroDocumentoEmis() + "/" + cabecera.getSerieDocumento() + "-" + cabecera.getCorrelativoDocumento();
         }
         File savedir = new File(ruta);
         if (!savedir.exists()) {
@@ -147,6 +154,11 @@ public class LectorXML extends Xml {
         File savefile = new File(savedir, nombreArchivo + ".xml");
         Archivo.guardarXML(savefile, archivo);
         LOGGER.log(Level.INFO, "RUTA GUARDADA XML: {0}", documento.getPathXML());
+    }
+
+    public boolean verificarSO() {
+        String so = System.getProperty("os.name");
+        return so.contains("Windows");
     }
 
     @Override
@@ -216,7 +228,7 @@ public class LectorXML extends Xml {
             case "1005":
                 total.setTotalSV(Double.parseDouble(valorSubtotal));
                 break;
-            default:  
+            default:
         }
     }
 

@@ -48,7 +48,7 @@ public abstract class Xml {
     protected String totalIGV = Etiqueta.CBC_TAXAMOUNT.obtenerEtiqueta();
     protected String nodoTotalVenta = Etiqueta.CAC_LEGALMONETARYTOTAL.obtenerEtiqueta();
     protected String totalVenta = Etiqueta.CBC_PAYABLEAMOUNT.obtenerEtiqueta();
-    public static boolean estado = true;
+    public static boolean estado = false;
     public static ErrorEtiquetas errorEtiquetas;
     public static int ERROR_AVISO = 0;
     public static int ERROR_ETIQUETA = 1;
@@ -351,7 +351,7 @@ public abstract class Xml {
         } catch (NullPointerException Null_Tipo_Moneda) {
             //Xml.estado = false;
             errorEtiquetas.setCodigoProducto(codigoProducto);
-            LOGGER.log(Level.WARNING, "EL XML NO CUENTA CON LA ETIQUETA '<CODIGO PRODUCTO>'");
+            //LOGGER.log(Level.INFO, "EL XML NO CUENTA CON LA ETIQUETA '<CODIGO PRODUCTO>'");
         }
         return null;
     }
@@ -362,7 +362,7 @@ public abstract class Xml {
         } catch (NullPointerException Null_Tipo_Moneda) {
             //Xml.estado = false;
             errorEtiquetas.setDescripcionProducto(descripcionProducto);
-            LOGGER.log(Level.WARNING, "EL XML NO CUENTA CON LA ETIQUETA '<DESCRIPCION>'");
+            //LOGGER.log(Level.INFO, "EL XML NO CUENTA CON LA ETIQUETA '<DESCRIPCION>'");
         }
         return null;
     }
