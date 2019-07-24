@@ -1,4 +1,5 @@
 dist/
 build/
-bitacora.log
+bitacora.*
 ReaderXML/src/com/readerxml/conexion/*
+config_service_email.*
