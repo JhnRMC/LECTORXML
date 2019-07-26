@@ -203,30 +203,25 @@ public class LectorEmail extends Thread {
                 if (nombreArchivo.endsWith(".xml")) {
                     System.out.println("Contenido: [" + i + "]" + nombreArchivo);
                     lectorXML.iniciarLectura(archivoAdjunto);
-                    existeXML = true;
-                }
+
+                } 
             } catch (MessagingException ex) {
-                Logger.getLogger(LectorEmail.class.getName()).log(Level.SEVERE, null, ex);
+                ex.printStackTrace();
             }
         }
+        if (!LectorXML.existe) {
+            for (int j = 1; j <= cantidadArchivos; j++) {
+                try {
+                    archivoAdjunto = archivosAdjuntos.getBodyPart(j);
+                    nombreArchivo = archivoAdjunto.getFileName().toLowerCase();
 
-        for (int j = 1; j <= cantidadArchivos; j++) {
-            try {
-                archivoAdjunto = archivosAdjuntos.getBodyPart(j);
-                nombreArchivo = archivoAdjunto.getFileName().toLowerCase();
-
-                if (nombreArchivo.endsWith(".pdf") && !LectorXML.existe) {
-                    System.out.println("Contenido: [" + j + "]" + nombreArchivo);
-                    Archivo.guardarPDF(archivoAdjunto, lectorXML.documento.getPathPDF());
+                    if (nombreArchivo.endsWith(".pdf") && !LectorXML.existe) {
+                        Archivo.guardarPDF(archivoAdjunto, lectorXML.documento.getPathPDF());
+                    }
+                } catch (MessagingException ex) {
+                    ex.printStackTrace();
                 }
-            } catch (MessagingException ex) {
-                Logger.getLogger(LectorEmail.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }
-
-        if (!existeXML) {
-            LOGGER.log(Level.WARNING, "NO SE ENCONTRO EL XML ENTRE LOS ARCHIVOS, O SE ENCUENTRA DENTRO DE UN ARCHIVO COMPRIMIDO (ZIP, RAR, 7Z)");
-            avisoRegistro();
         }
     }
 }

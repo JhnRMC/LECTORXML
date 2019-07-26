@@ -1,6 +1,7 @@
 dist/
 build/
 bitacora.*
-ReaderXML/src/com/readerxml/conexion/*
-config_service_email.*
 *.rar
+nbproject/
+build.*
+manifest.*

@@ -34,7 +34,7 @@ public class DocumentoElectronicoDAO {
             cs.registerOutParameter(5, oracle.jdbc.OracleTypes.CURSOR);
             cs.execute();
             rs = (ResultSet) cs.getObject(5);
-            if(rs.next()){
+            if(rs.next()){                
                 isExiste = true;  
             }
             

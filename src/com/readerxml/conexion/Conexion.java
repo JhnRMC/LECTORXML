@@ -43,6 +43,7 @@ public class Conexion {
         //------------ DESARROLLO -------------------
         //url = "jdbc:oracle:thin:@ 192.168.253.108:1521:gp";
         //------------ PRODUCCION -------------------
+        //url = "jdbc:oracle:thin:@ 192.168.253.180:1521:gp";
         url = LectorEmail.propiedades.getProperty("url.conexion");
         user = "comercial";
         pass = "gp";

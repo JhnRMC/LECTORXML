@@ -386,7 +386,7 @@ public abstract class Xml {
             errorEtiquetas.setPrecioProducto(precioProducto);
             LOGGER.log(Level.WARNING, "EL XML NO CUENTA CON LA ETIQUETA '<PRECIO>'");
         }
-        return null;
+        return "0.0";
     }
 
     protected String getValorVenta() {
@@ -397,7 +397,7 @@ public abstract class Xml {
             errorEtiquetas.setValorVenta(valorVenta);
             LOGGER.log(Level.WARNING, "EL XML NO CUENTA CON LA ETIQUETA '<VALOR DE VENTA>'");
         }
-        return null;
+        return "0.0";
     }
 
     protected String getTipoTotal() {
