@@ -5,6 +5,7 @@
  */
 package com.readerxml.dao;
 
+import com.readerxml.LectorEmail;
 import com.readerxml.bean.ErrorEtiquetas;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -23,7 +24,7 @@ public class SendEmailSqliteDAO {
 
     private final static Logger LOGGER = Logger.getLogger("com.readerxml.dao.SendEmailSqliteDAO");
 
-    String pathSqlite = "c:/home/BDEnvioAlertas.db";
+    String pathSqlite = LectorEmail.propiedades.getProperty("path.sqlite");
     //String lite = "D:\\lite.db";
     String url = "jdbc:sqlite:" + pathSqlite;
 

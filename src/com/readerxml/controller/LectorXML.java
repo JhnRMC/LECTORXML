@@ -61,7 +61,6 @@ public class LectorXML extends Xml {
             receptor();
             detalle();
             total();
-            guardarDocumentoElectronico(archivo);
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
         } catch (SAXException e) {
@@ -70,26 +69,28 @@ public class LectorXML extends Xml {
             LOGGER.log(Level.SEVERE, "ERROR CON EL ARCHIVO");
         } catch (NumberFormatException errorFormat) {
             LOGGER.log(Level.SEVERE, "NO SE ENCONTRO LA ETIQUETA: Invoice, CreditNote o DebitNote, QUE IDENTIFICA UN DOCUMENTO VALIDO.({0})", ETIQUETA_GLOBAL);
+
         }
+        guardarDocumentoElectronico(archivo);
     }
 
     public void guardarDocumentoElectronico(Part archivo) {
+        generarPath(archivo);
         DocumentoElectronicoDAO documentoElectronicoDAO = new DocumentoElectronicoDAO();
-        if (!existeDocumento(documentoElectronicoDAO)) {
-            existe = false;
-            generarPath(archivo);
-            documento.setCabecera(cabecera);
-            documento.setTotal(total);
-            documento.setDetallesDocumento(listaDetalle);
-            if (!Xml.estado) {
-                registrarError(Xml.ERROR_ETIQUETA);
-                registrarErrorLog();
-            } else {
-                documentoElectronicoDAO.insertDocumentoElectronico(documento);
-            }
+        if (!Xml.estado) {
+            registrarError(Xml.ERROR_ETIQUETA);
+            registrarErrorLog();
         } else {
-            existe = true;
-            LOGGER.log(Level.INFO, "DOCUMENTO EXISTENTE EN LA BD");
+            if (!existeDocumento(documentoElectronicoDAO)) {
+                existe = false;
+                documento.setCabecera(cabecera);
+                documento.setTotal(total);
+                documento.setDetallesDocumento(listaDetalle);
+                documentoElectronicoDAO.insertDocumentoElectronico(documento);
+            } else {
+                existe = true;
+                LOGGER.log(Level.INFO, "DOCUMENTO EXISTENTE EN LA BD");
+            }
         }
     }
 
@@ -102,7 +103,7 @@ public class LectorXML extends Xml {
         emailSend.setAsunto("REGISTRO DE ERRORES");
         emailSend.setNombreArchivo(LectorEmail.flag + ".xml");
         emailSend.setRutaArchivo(documento.getPathXML());
-        emailSend.setDestino("jhonrmc15@gmail.com");
+        emailSend.setDestino(LectorEmail.email);
         emailSend.setTipoMensaje(tipoError);
         SendEmailSqliteDAO dao = new SendEmailSqliteDAO();
         if (dao.registrarSuccessEnvioCorreo(emailSend, errorEtiquetas)) {
@@ -115,7 +116,7 @@ public class LectorXML extends Xml {
     public void registrarAviso(int tipoError) {
         EmailSend emailSend = new EmailSend();
         emailSend.setAsunto("AVISO DE RECHAZO DE CORREO");
-        emailSend.setDestino("jhonrmc15@gmail.com");
+        emailSend.setDestino(LectorEmail.email);
         emailSend.setNombreArchivo("");
         emailSend.setRutaArchivo("");
         emailSend.setTipoMensaje(tipoError);

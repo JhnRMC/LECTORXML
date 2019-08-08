@@ -38,7 +38,7 @@ public class LectorEmail extends Thread {
     public static String fecha;
     private static LectorEmail lectorEmail;
     private boolean verificacionEnvio = true;
-    private boolean existeXML;
+    private boolean existeXML;    
 
     public static void main(String[] args) {
         lectorEmail = new LectorEmail();
@@ -139,7 +139,7 @@ public class LectorEmail extends Thread {
                             System.out.println("De: " + LectorEmail.email);
                             Multipart archivosAdjuntos = (Multipart) messages[i].getContent();
                             cantidadArchivos = archivosAdjuntos.getCount() - 1;
-                            if (cantidadArchivos == 2) {
+                            if (cantidadArchivos < 5) {
                                 leer(archivosAdjuntos);
                             } else {
                                 avisoRegistro();
@@ -199,12 +199,11 @@ public class LectorEmail extends Thread {
             try {
                 archivoAdjunto = archivosAdjuntos.getBodyPart(i);
                 nombreArchivo = archivoAdjunto.getFileName().toLowerCase();
-
+                System.out.println("Contenido: [" + i + "]" + nombreArchivo);
                 if (nombreArchivo.endsWith(".xml")) {
-                    System.out.println("Contenido: [" + i + "]" + nombreArchivo);
                     lectorXML.iniciarLectura(archivoAdjunto);
 
-                } 
+                }
             } catch (MessagingException ex) {
                 ex.printStackTrace();
             }

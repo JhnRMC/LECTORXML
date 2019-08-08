@@ -261,7 +261,7 @@ public abstract class Xml {
 
     protected String getNumeroDocumentoEmisor() {
         try {
-            return nodo().elemento(nodoEmisor).etiquetaAnidada(numeroDocumentoEmisor);
+            return nodo().elemento(nodoPrincipalEmisor).elemento(nodoEmisor).etiquetaAnidada(numeroDocumentoEmisor);
         } catch (NullPointerException Null_Tipo_Moneda) {
             Xml.estado = false;
             errorEtiquetas.setNumeroDocumentoEmisor(numeroDocumentoEmisor);
