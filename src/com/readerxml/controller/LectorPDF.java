@@ -4,5 +4,5 @@ import java.util.logging.Logger;
 
 public class LectorPDF {
 
-    private final static Logger LOGGER = Logger.getLogger("com.readerxml.controller.LectorPDF");
+    private final static Logger LOGGER = Logger.getLogger(LectorPDF.class.getName());
 }

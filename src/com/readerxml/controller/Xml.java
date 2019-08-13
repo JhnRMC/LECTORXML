@@ -52,7 +52,7 @@ public abstract class Xml {
     public static ErrorEtiquetas errorEtiquetas;
     public static int ERROR_AVISO = 0;
     public static int ERROR_ETIQUETA = 1;
-    private final static Logger LOGGER = Logger.getLogger("com.readerxml.controller.Xml");
+    private final static Logger LOGGER = Logger.getLogger(Xml.class.getName());
 
     protected void iniciar(Document xml) throws NullPointerException {
         this.xml = xml;

@@ -21,10 +21,11 @@ import java.util.logging.Logger;
 import com.readerxml.LectorEmail;
 import com.readerxml.bean.EmailSend;
 import com.readerxml.bean.Total;
+import com.readerxml.util.Log;
 
 public class LectorXML extends Xml {
 
-    private final static Logger LOGGER = Logger.getLogger("com.readerxml.controller.LectorXML");
+    private final static Logger LOGGER = Logger.getLogger(LectorXML.class.getName());
     private static LectorXML lectorXML;
     public Documento documento;
     Cabecera cabecera;
@@ -33,11 +34,7 @@ public class LectorXML extends Xml {
     Total total;
     public static boolean existe = true;
 
-    private LectorXML() {
-        documento = new Documento();
-        cabecera = new Cabecera();
-        detalle = new Detalle();
-        total = new Total();
+    private LectorXML() {        
     }
 
     public static LectorXML newInstance() {
@@ -64,7 +61,7 @@ public class LectorXML extends Xml {
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
         } catch (SAXException e) {
-            LOGGER.log(Level.SEVERE, "LECTURA NO PERMITIDA: {0}", LectorEmail.getStackTrace(e));
+            LOGGER.log(Level.SEVERE, "LECTURA NO PERMITIDA: {0}", Log.getStackTrace(e));
         } catch (IOException errorFile) {
             LOGGER.log(Level.SEVERE, "ERROR CON EL ARCHIVO");
         } catch (NumberFormatException errorFormat) {
@@ -163,7 +160,8 @@ public class LectorXML extends Xml {
     }
 
     @Override
-    public void cabecera() {
+    public void cabecera() {documento = new Documento();
+        cabecera = new Cabecera();        
         System.out.println("=============INICIO CABECERA===========");
         String[] serieYCorrelativo = getNumeroDocumento();
         cabecera.setTipoDocumento(Integer.parseInt(getTipoDocumento()));
@@ -194,6 +192,7 @@ public class LectorXML extends Xml {
         listaDetalle = new ArrayList<>();
         int lista = obtenerCantidadProductos();
         for (int i = 0; i < lista; i++) {
+            detalle = new Detalle();
             generarDetalle(i);
             detalle.setItemProducto(Integer.parseInt(getNumeroItem()));
             detalle.setCodProducto(getcodigoProducto());
@@ -206,7 +205,8 @@ public class LectorXML extends Xml {
     }
 
     @Override
-    public void total() {
+    public void total() {        
+        total = new Total();
         obtenerTipoOperacion(getTipoTotal(), getValorSubTotal());
         total.setTotalIGV(Double.parseDouble(getTotalIGV()));
         total.setTotalVenta(Double.parseDouble(getTotalVenta()));

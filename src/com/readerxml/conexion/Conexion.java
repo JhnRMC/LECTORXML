@@ -1,6 +1,7 @@
 package com.readerxml.conexion;
 
 import com.readerxml.LectorEmail;
+import com.readerxml.util.Propiedades;
 import java.sql.*;
 
 public class Conexion {
@@ -44,7 +45,7 @@ public class Conexion {
         //url = "jdbc:oracle:thin:@ 192.168.253.108:1521:gp";
         //------------ PRODUCCION -------------------
         //url = "jdbc:oracle:thin:@ 192.168.253.180:1521:gp";
-        url = LectorEmail.propiedades.getProperty("url.conexion");
+        url = Propiedades.propiedades.getProperty("url.conexion");
         user = "comercial";
         pass = "gp";
 

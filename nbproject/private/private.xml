@@ -2,6 +2,15 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group/>
+        <group>
+            <file>file:/D:/Jhn/GRUPO%20PANA/MAILE_V3/ReaderXML/src/com/readerxml/dao/DocumentoElectronicoDAO.java</file>
+            <file>file:/D:/Jhn/GRUPO%20PANA/MAILE_V3/ReaderXML/src/com/readerxml/util/Log.java</file>
+            <file>file:/D:/Jhn/GRUPO%20PANA/MAILE_V3/ReaderXML/src/com/readerxml/controller/LectorXML.java</file>
+            <file>file:/D:/Jhn/GRUPO%20PANA/MAILE_V3/ReaderXML/src/com/readerxml/conexion/Conexion.java</file>
+            <file>file:/D:/Jhn/GRUPO%20PANA/MAILE_V3/ReaderXML/src/com/readerxml/LectorEmail.java</file>
+            <file>file:/D:/Jhn/GRUPO%20PANA/MAILE_V3/ReaderXML/src/com/readerxml/util/Etiqueta.java</file>
+            <file>file:/D:/Jhn/GRUPO%20PANA/MAILE_V3/ReaderXML/src/com/readerxml/dao/SendEmailSqliteDAO.java</file>
+            <file>file:/D:/Jhn/GRUPO%20PANA/MAILE_V3/ReaderXML/src/com/readerxml/util/Propiedades.java</file>
+        </group>
     </open-files>
 </project-private>
