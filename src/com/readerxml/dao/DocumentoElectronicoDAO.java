@@ -1,5 +1,6 @@
 package com.readerxml.dao;
 
+import com.readerxml.LectorEmail;
 import com.readerxml.bean.Documento;
 import com.readerxml.bean.Detalle;
 import com.readerxml.conexion.Conexion;
@@ -11,10 +12,12 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import com.readerxml.bean.Total;
+import com.readerxml.util.Propiedades;
+import java.io.IOException;
 
 public class DocumentoElectronicoDAO {
 
-    private final static Logger LOGGER = Logger.getLogger("com.readerxml.dao.DocumentoElectronicoDAO");
+    private final static Logger LOGGER = Logger.getLogger(DocumentoElectronicoDAO.class.getName());
     private CallableStatement cs;
     private int codigoDocumento;
     Conexion conexion;
@@ -34,13 +37,16 @@ public class DocumentoElectronicoDAO {
             cs.registerOutParameter(5, oracle.jdbc.OracleTypes.CURSOR);
             cs.execute();
             rs = (ResultSet) cs.getObject(5);
-            if(rs.next()){                
-                isExiste = true;  
+            if (rs.next()) {
+                isExiste = true;
             }
-            
+
             rs.close();
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, "ERROR EN LA VERIFICACION DE EXISTENCIA DE LA CUENTA");
+            corregirConexion();
+        } catch (NullPointerException nullExp) {
+            corregirConexion();
         } finally {
             try {
                 if (rs != null) {
@@ -52,7 +58,9 @@ public class DocumentoElectronicoDAO {
                 if (conexion != null) {
                     conexion.closeConnection();
                 }
+            } catch (NullPointerException ex) {
             } catch (SQLException ex1) {
+                corregirConexion();
                 LOGGER.log(Level.SEVERE, "PROBLEMAS PARA CERRAR LA CONEXION DE VERIFICACION DE EXISTENCIA DE CUENTA");
             }
         }
@@ -105,24 +113,43 @@ public class DocumentoElectronicoDAO {
                     cs.execute();
                 } catch (SQLException e) {
                     LOGGER.log(Level.SEVERE, "ERROR AL LLAMAR AL PROCEDIMIENTO ALMACENADO DE INSERCION DE DOCUMENTO");
+                } catch (NullPointerException ex) {
+                    corregirConexion();
                 }
 
             });
             LOGGER.log(Level.INFO, "DOCUMENTO: {0}-{1} REGISTRADO CORRECTAMENTE.", new Object[]{cabecera.getSerieDocumento(), cabecera.getCorrelativoDocumento()});
 
+        } catch (NullPointerException nullExp) {
+            LOGGER.log(Level.SEVERE, "PROBLEMAS CON LA CONEXIÓN DE RED");
+            corregirConexion();
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "ERROR AL INSERTAR EL DOCUMENTO");
+            corregirConexion();
         } finally {
             try {
                 conexion.closeConnection();// libera cn
                 if (cs != null) {
                     cs.close();
                 }
+            } catch (NullPointerException ex) {
+                corregirConexion();
             } catch (SQLException e) {
+                corregirConexion();
                 LOGGER.log(Level.SEVERE, "ERROR AL CERRAR LA CONEXION DE LA INSERCION DE DOCUMENTO");
             }
         }
         return success;
 
+    }
+
+    public void corregirConexion() {
+        try {
+            --LectorEmail.cantidadCorreosLeidos;
+            Propiedades.escribirPropiedad("cantidad.msg.buzon.leidos", String.valueOf(LectorEmail.cantidadCorreosLeidos));
+            LOGGER.log(Level.SEVERE, "PROBLEMAS CON LA CONEXIÓN DE RED");
+        } catch (IOException ex) {
+            Logger.getLogger(DocumentoElectronicoDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

@@ -1,6 +1,6 @@
 package com.readerxml.controller;
 
-import com.readerxml.LectorEmail;
+import com.readerxml.util.Log;
 import javax.mail.MessagingException;
 import javax.mail.Part;
 import java.io.*;
@@ -10,7 +10,7 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 
 public class Archivo {
 
-    private final static Logger LOGGER = Logger.getLogger("com.readerxml.controller.Archivo");
+    private final static Logger LOGGER = Logger.getLogger(Archivo.class.getName());
 
     public static void guardarXML(File savefile, Part part) {
         try {
@@ -26,9 +26,9 @@ public class Archivo {
             }
             is.close();
         } catch (FileNotFoundException e) {
-            LOGGER.log(Level.SEVERE, "PROBLEMAS: {0}", LectorEmail.getStackTrace(e));
+            LOGGER.log(Level.SEVERE, "PROBLEMAS: {0}", Log.getStackTrace(e));
         } catch (IOException | MessagingException e) {
-            LOGGER.log(Level.SEVERE, "PROBLEMAS: {0}", LectorEmail.getStackTrace(e));
+            LOGGER.log(Level.SEVERE, "PROBLEMAS: {0}", Log.getStackTrace(e));
         }
     }
 
@@ -39,7 +39,7 @@ public class Archivo {
             LOGGER.log(Level.INFO, "RUTA GUARDADA PDF: {0}", path);
             
         } catch (IOException ex) {
-            LOGGER.log(Level.SEVERE, "PROBLEMAS: {0}", LectorEmail.getStackTrace(ex));
+            LOGGER.log(Level.SEVERE, "PROBLEMAS: {0}", Log.getStackTrace(ex));
         } catch (MessagingException ex) {
             LOGGER.log(Level.SEVERE, "PROBLEMA PARA EL GUARDADO DEL PDF");
         } catch (NullPointerException nulex){
