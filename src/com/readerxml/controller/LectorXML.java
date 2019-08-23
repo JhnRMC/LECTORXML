@@ -79,6 +79,7 @@ public class LectorXML extends Xml {
             registrarErrorLog();
         } else {
             if (!existeDocumento(documentoElectronicoDAO)) {
+                System.out.println("REGISTRANDO...");
                 existe = false;
                 documento.setCabecera(cabecera);
                 documento.setTotal(total);

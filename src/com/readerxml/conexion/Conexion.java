@@ -1,6 +1,5 @@
 package com.readerxml.conexion;
 
-import com.readerxml.LectorEmail;
 import com.readerxml.util.Propiedades;
 import java.sql.*;
 

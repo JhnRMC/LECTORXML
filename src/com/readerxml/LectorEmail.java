@@ -86,7 +86,7 @@ public class LectorEmail extends Thread {
                     if (esCorrectoElFormatoAdjunto()) {
                         Multipart archivosAdjuntos = (Multipart) correo.getContent();
                         leerInfoAdjunto(archivosAdjuntos);
-                        if (esValido()) {
+                        if (esValidoLaCantidadArchivos()) {
                             archivos.forEach(archivo -> leerXML(archivo));
                             archivos.forEach(archivo -> leerPDF(archivo));
                         }
@@ -118,7 +118,7 @@ public class LectorEmail extends Thread {
         }
     }
 
-    public boolean esValido() {
+    public boolean esValidoLaCantidadArchivos() {
         boolean validacion = archivos.size() == 2;
         if (!validacion) {
             LOGGER.log(Level.WARNING, "EL CORREO NO CONTIENE LA CANTIDAD DE  DOCUMENTOS PARA SU VALIDACION, UN PDF Y XML");
@@ -201,36 +201,68 @@ public class LectorEmail extends Thread {
         return tipoMime;
     }
 
-    private void leerInfoAdjunto(Multipart archivosAdjuntos) throws MessagingException {
+    private void leerInfoAdjunto(Multipart archivosAdjuntos) throws MessagingException, IOException {
         Part primeraParte = null;
-        Part archivoAdjunto = null;
-        String nombreArchivo;
         cont = 0;
-        for (int i = 0; i < archivosAdjuntos.getCount(); i++) {
-
+        int cantidadArchivosAdjuntos = archivosAdjuntos.getCount();
+        for (int i = 0; i < cantidadArchivosAdjuntos; i++) {
             try {
                 primeraParte = archivosAdjuntos.getBodyPart(i);
-                if ((primeraParte.getContentType().toLowerCase().trim().contains(".xml") || primeraParte.getContentType().toLowerCase().trim().contains(".pdf")) && primeraParte.getContentType().toLowerCase().trim().contains("application/octet-stream") && primeraParte.getDisposition() == null) {
-                    System.out.println(++cont);
-                    archivoAdjunto = archivosAdjuntos.getBodyPart(i);
-                    nombreArchivo = archivoAdjunto.getFileName().toLowerCase();
-                    System.out.println("NOMBRE ARCHIVO: " + nombreArchivo);
-                    archivos.add(archivoAdjunto);
-                } else if ((primeraParte.getContentType().toLowerCase().trim().contains(".xml") || primeraParte.getContentType().toLowerCase().contains(".pdf")) && primeraParte.getDisposition().equals(Part.ATTACHMENT)) {
-                    System.out.println(++cont);
-                    archivoAdjunto = archivosAdjuntos.getBodyPart(i);
-                    nombreArchivo = archivoAdjunto.getFileName().toLowerCase();
-                    System.out.println("NOMBRE ARCHIVO: " + nombreArchivo);
-                    archivos.add(archivoAdjunto);
+                if (esCorrectoElDocumento(primeraParte)) {
+                    agregarArchivoLista(primeraParte);
                 } else {
                     leerInfoAdjunto((Multipart) primeraParte.getContent());
                 }
-
             } catch (ClassCastException | MessagingException ex) {
+                /*String result = new BufferedReader(new InputStreamReader(primeraParte.getInputStream())).lines()
+                        .parallel().collect(Collectors.joining("\n"));
+                System.out.println("RESULTADO: " + result);*/
             } catch (IOException ex) {
                 Logger.getLogger(LectorEmail.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
 
+    public boolean esCorrectoElDocumento(Part primeraParte) throws MessagingException {
+        if ((esCorretoContenido(primeraParte) && EsCorrectoFormatoMIME(primeraParte)) && esNuloDisposition(primeraParte)) {
+            return true;
+        } else if (esCorretoContenido(primeraParte) && primeraParte.getDisposition().contains(Part.ATTACHMENT)) {
+            return true;
+        } else if (esCorrectoElNombre(primeraParte) && primeraParte.getDisposition().contains(Part.ATTACHMENT)) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean esCorretoContenido(Part primeraParte) throws MessagingException {
+        try {
+            return primeraParte.getContentType().toLowerCase().trim().contains(".xml") || primeraParte.getContentType().toLowerCase().contains(".pdf");
+        } catch (NullPointerException ex) {
+            return false;
+        }
+    }
+
+    public boolean esCorrectoElNombre(Part primeraParte) throws MessagingException {
+        try {
+            return primeraParte.getFileName().toLowerCase().trim().contains(".xml") || primeraParte.getFileName().toLowerCase().contains(".pdf");
+        } catch (NullPointerException ex) {
+            return false;
+        }
+    }
+
+    public boolean EsCorrectoFormatoMIME(Part primeraParte) throws MessagingException {
+        return primeraParte.getContentType().toLowerCase().trim().contains("application/octet-stream");
+    }
+
+    public boolean esNuloDisposition(Part primeraParte) throws MessagingException {
+        return primeraParte.getDisposition() == null;
+    }
+
+    public void agregarArchivoLista(Part archivoAdjunto) throws MessagingException {
+        String nombreArchivo;
+        System.out.println("ARCHIVO NUMERO: " + (++cont));
+        nombreArchivo = archivoAdjunto.getFileName().toLowerCase();
+        System.out.println("NOMBRE ARCHIVO: " + nombreArchivo);
+        archivos.add(archivoAdjunto);
+    }
 }

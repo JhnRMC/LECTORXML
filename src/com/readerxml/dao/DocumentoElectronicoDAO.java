@@ -37,12 +37,14 @@ public class DocumentoElectronicoDAO {
             cs.registerOutParameter(5, oracle.jdbc.OracleTypes.CURSOR);
             cs.execute();
             rs = (ResultSet) cs.getObject(5);
+
             if (rs.next()) {
+                System.out.println("DOCUMENTO EXISTENTE : " + rs.getString(7) + "-" + rs.getString(3) + "-" + rs.getString(4));
                 isExiste = true;
             }
-
             rs.close();
         } catch (SQLException ex) {
+            ex.printStackTrace();
             LOGGER.log(Level.SEVERE, "ERROR EN LA VERIFICACION DE EXISTENCIA DE LA CUENTA");
             corregirConexion();
         } catch (NullPointerException nullExp) {
@@ -112,6 +114,7 @@ public class DocumentoElectronicoDAO {
                     cs.setDouble(7, detalle.getValorVentaProducto());
                     cs.execute();
                 } catch (SQLException e) {
+                    e.printStackTrace();
                     LOGGER.log(Level.SEVERE, "ERROR AL LLAMAR AL PROCEDIMIENTO ALMACENADO DE INSERCION DE DOCUMENTO");
                 } catch (NullPointerException ex) {
                     corregirConexion();

@@ -44,7 +44,7 @@ public class Log {
             fileHandler.setLevel(Level.SEVERE);
             fileHandler.setLevel(Level.WARNING);
 
-            LOGGER.log(Level.INFO, "Log inicializada");
+            LOGGER.log(Level.INFO, "Log inicializada - ORIGINAL");
 
         } catch (IOException | SecurityException ex) {
             LOGGER.log(Level.SEVERE, getStackTrace(ex));
