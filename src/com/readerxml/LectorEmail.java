@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class LectorEmail extends Thread {
+public class LectorEmail {
 
     private LectorXML lectorXML;
     public static int cantidadCorreosLeidos;
@@ -33,19 +33,6 @@ public class LectorEmail extends Thread {
 
     public LectorEmail() {
         Propiedades.cargarPropiedades();
-        Log.registrar();
-    }
-
-    public static void main(String[] args) {
-        lectorEmail = new LectorEmail();
-        lectorEmail.start();
-    }
-
-    @Override
-    public void run() {
-        while (true) {
-            configuracionEmail();
-        }
     }
 
     public void configuracionEmail() {
