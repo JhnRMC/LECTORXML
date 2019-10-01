@@ -34,7 +34,6 @@ public class LectorEmail extends Thread {
     public LectorEmail() {
         Propiedades.cargarPropiedades();
         Log.registrar();
-        lectorXML = LectorXML.newInstance();
     }
 
     public static void main(String[] args) {
@@ -52,6 +51,7 @@ public class LectorEmail extends Thread {
     public void configuracionEmail() {
 
         try {
+            lectorXML = new LectorXML();
             Session session = Session.getInstance(Propiedades.propiedades);
             Store store = session.getStore(Propiedades.propiedades.getProperty("protocolo.correo"));
             store.connect(Propiedades.propiedades.getProperty("host.name"),
@@ -66,6 +66,8 @@ public class LectorEmail extends Thread {
             }
         } catch (MessagingException ex) {
             ex.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -111,10 +113,17 @@ public class LectorEmail extends Thread {
             if (isValidoElCorreo) {
                 LOGGER.log(Level.INFO, "A LA ESPERA DE NUEVOS CORREOS...");
                 isValidoElCorreo = false;
+            } else {
+                System.out.println("Fecha: " + new Date());
             }
         } catch (IllegalStateException illegalEx) {
             LOGGER.log(Level.SEVERE, "PROBLEMAS EN LA CONFIGURACION DE APERTURA DEL BUZON, SE REALIZA RECONFIGURACION.");
             configuracionEmail();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            Runtime garbage = Runtime.getRuntime();
+            garbage.gc();
         }
     }
 

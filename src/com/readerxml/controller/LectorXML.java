@@ -26,7 +26,6 @@ import com.readerxml.util.Log;
 public class LectorXML extends Xml {
 
     private final static Logger LOGGER = Logger.getLogger(LectorXML.class.getName());
-    private static LectorXML lectorXML;
     public Documento documento;
     Cabecera cabecera;
     Detalle detalle;
@@ -34,14 +33,7 @@ public class LectorXML extends Xml {
     Total total;
     public static boolean existe = true;
 
-    private LectorXML() {        
-    }
-
-    public static LectorXML newInstance() {
-        if (lectorXML == null) {
-            lectorXML = new LectorXML();
-        }
-        return lectorXML;
+    public LectorXML() {        
     }
 
     public void iniciarLectura(Part archivo) throws MessagingException {
