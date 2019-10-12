@@ -90,7 +90,7 @@ public class SendEmailSqliteDAO {
                     + "email,"
                     + "asunto,"
                     + "fecha_correo)"
-                    + "VALUES('" + error.getETIQUETA_GLOBAL() + "','"
+                    + "VALUES('" + error.getEtiquetaGlobal()+ "','"
                     + error.getNumeroDocumento() + "','"
                     + error.getTipoMoneda() + "','"
                     + error.getFechaEmision() + "','"

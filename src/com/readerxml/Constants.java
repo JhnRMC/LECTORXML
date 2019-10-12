@@ -1,4 +1,4 @@
-package maile.util;
+package com.readerxml;
 
 public class Constants{
     public static String delay = "2s";

@@ -5,68 +5,56 @@ import com.readerxml.dao.DocumentoElectronicoDAO;
 import com.readerxml.bean.Documento;
 import com.readerxml.bean.Detalle;
 import com.readerxml.bean.Cabecera;
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
-
-import javax.mail.MessagingException;
 import javax.mail.Part;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import com.readerxml.LectorEmail;
 import com.readerxml.bean.EmailSend;
 import com.readerxml.bean.Total;
-import com.readerxml.util.Log;
+import com.readerxml.bean.ErrorEtiquetas;
+import com.readerxml.util.Etiqueta;
+import java.util.HashMap;
 
-public class LectorXML extends Xml {
+public class LectorXML extends Xml implements Xml.Callback {
 
     private final static Logger LOGGER = Logger.getLogger(LectorXML.class.getName());
     public Documento documento;
     Cabecera cabecera;
     Detalle detalle;
-    ArrayList<Detalle> listaDetalle;
+    ArrayList<Detalle> listaDetalles;
     Total total;
-    public static boolean existe = true;
+    ErrorEtiquetas etiquetaErradas;
+    HashMap<Integer, String> etiquetasErradas = new HashMap();
+    private boolean existe = true;
 
-    public LectorXML() {        
+    public LectorXML() {
+        etiquetaErradas = new ErrorEtiquetas();
     }
 
-    public void iniciarLectura(Part archivo) throws MessagingException {
+    public void iniciarLectura(Part archivo) {
         System.out.println("=============LECTURA DEL XML===========");
-        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder dBuilder;
-        try {
-            dBuilder = dbFactory.newDocumentBuilder();
-            Document xml = dBuilder.parse(archivo.getInputStream());
-            Xml.estado = true;
-            super.iniciar(xml);
+        try {           
+            etiquetaValida = true;
+            super.iniciar(archivo, this);
             cabecera();
             emisor();
             receptor();
             detalle();
             total();
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        } catch (SAXException e) {
-            LOGGER.log(Level.SEVERE, "LECTURA NO PERMITIDA: {0}", Log.getStackTrace(e));
-        } catch (IOException errorFile) {
-            LOGGER.log(Level.SEVERE, "ERROR CON EL ARCHIVO");
-        } catch (NumberFormatException errorFormat) {
-            LOGGER.log(Level.SEVERE, "NO SE ENCONTRO LA ETIQUETA: Invoice, CreditNote o DebitNote, QUE IDENTIFICA UN DOCUMENTO VALIDO.({0})", ETIQUETA_GLOBAL);
-
+        }catch (NumberFormatException errorFormat) {
+            LOGGER.log(Level.SEVERE, "NO SE ENCONTRO LA ETIQUETA: Invoice, CreditNote o DebitNote, QUE IDENTIFICA UN DOCUMENTO VALIDO.({0})", etiquetaGlobal);
+        } finally {
+            guardarDocumentoElectronico(archivo);
         }
-        guardarDocumentoElectronico(archivo);
+
     }
 
     public void guardarDocumentoElectronico(Part archivo) {
         generarPath(archivo);
         DocumentoElectronicoDAO documentoElectronicoDAO = new DocumentoElectronicoDAO();
-        if (!Xml.estado) {
+        if (!isEtiquetaValida()) {
             registrarError(Xml.ERROR_ETIQUETA);
             registrarErrorLog();
         } else {
@@ -75,7 +63,7 @@ public class LectorXML extends Xml {
                 existe = false;
                 documento.setCabecera(cabecera);
                 documento.setTotal(total);
-                documento.setDetallesDocumento(listaDetalle);
+                documento.setDetallesDocumento(listaDetalles);
                 documentoElectronicoDAO.insertDocumentoElectronico(documento);
             } else {
                 existe = true;
@@ -85,7 +73,12 @@ public class LectorXML extends Xml {
     }
 
     public boolean existeDocumento(DocumentoElectronicoDAO documentoElectronicoDAO) {
-        return documentoElectronicoDAO.verificarDocumentoExistente(cabecera.getSerieDocumento(), cabecera.getCorrelativoDocumento(), cabecera.getNroDocumentoEmis(), cabecera.getTipoDocumento());
+        return documentoElectronicoDAO.verificarDocumentoExistente(
+                cabecera.getSerieDocumento(), 
+                cabecera.getCorrelativoDocumento(), 
+                cabecera.getNroDocumentoEmis(), 
+                cabecera.getTipoDocumento()
+        );
     }
 
     public void registrarError(int tipoError) {
@@ -96,11 +89,12 @@ public class LectorXML extends Xml {
         emailSend.setDestino(LectorEmail.email);
         emailSend.setTipoMensaje(tipoError);
         SendEmailSqliteDAO dao = new SendEmailSqliteDAO();
-        if (dao.registrarSuccessEnvioCorreo(emailSend, errorEtiquetas)) {
+        LOGGER.log(Level.WARNING, "REGISTRO ERROR: {0}", emailSend.getAsunto());
+        /*if (dao.registrarSuccessEnvioCorreo(emailSend, errorEtiquetas)) {
             LOGGER.log(Level.WARNING, "REGISTRO EXITOSO, PARA EL ENVIO DE CORREO");
         } else {
             LOGGER.log(Level.WARNING, "ERROR EN EL REGISTRO, PARA EL ENVIO DE CORREO");
-        }
+        }*/
     }
 
     public void registrarAviso(int tipoError) {
@@ -111,24 +105,25 @@ public class LectorXML extends Xml {
         emailSend.setRutaArchivo("");
         emailSend.setTipoMensaje(tipoError);
         SendEmailSqliteDAO dao = new SendEmailSqliteDAO();
-        if (dao.registrarSuccessEnvioCorreo(emailSend, errorEtiquetas)) {
+        LOGGER.log(Level.WARNING, "REGISTRO ERROR: {0}", emailSend.getAsunto());
+        /*if (dao.registrarSuccessEnvioCorreo(emailSend, errorEtiquetas)) {
             LOGGER.log(Level.WARNING, "REGISTRO EXITOSO, PARA EL ENVIO DE CORREO");
         } else {
             LOGGER.log(Level.WARNING, "ERROR EN EL REGISTRO, PARA EL ENVIO DE CORREO");
-        }
+        }*/
     }
 
     public void generarPath(Part archivo) {
         String ruta;
         String ruta_SO;
         String nombreArchivo = null;
-        if (verificarSO()) {
+        if (isSOWindow()) {
             ruta_SO = "c:/";
         } else {
             ruta_SO = "/";
         }
 
-        if (!Xml.estado) {
+        if (!isEtiquetaValida()) {
             ruta = ruta_SO + "home/error";
             nombreArchivo = LectorEmail.flag;
         } else {
@@ -147,14 +142,15 @@ public class LectorXML extends Xml {
         LOGGER.log(Level.INFO, "RUTA GUARDADA XML: {0}", documento.getPathXML());
     }
 
-    public boolean verificarSO() {
+    public boolean isSOWindow() {
         String so = System.getProperty("os.name");
         return so.contains("Windows");
     }
 
     @Override
-    public void cabecera() {documento = new Documento();
-        cabecera = new Cabecera();        
+    public void cabecera() {
+        documento = new Documento();
+        cabecera = new Cabecera();
         System.out.println("=============INICIO CABECERA===========");
         String[] serieYCorrelativo = getNumeroDocumento();
         cabecera.setTipoDocumento(Integer.parseInt(getTipoDocumento()));
@@ -182,23 +178,23 @@ public class LectorXML extends Xml {
 
     @Override
     public void detalle() {
-        listaDetalle = new ArrayList<>();
+        listaDetalles = new ArrayList<>();
         int lista = obtenerCantidadProductos();
         for (int i = 0; i < lista; i++) {
             detalle = new Detalle();
             generarDetalle(i);
             detalle.setItemProducto(Integer.parseInt(getNumeroItem()));
-            detalle.setCodProducto(getcodigoProducto());
+            detalle.setCodProducto(getCodigoProducto());
             detalle.setDescProducto(getDescripcionProducto());
             detalle.setCantProducto(Double.parseDouble(getCantidadProducto()));
             detalle.setPrecioUnitarioProducto(Double.parseDouble(getPrecioProducto()));
             detalle.setValorVentaProducto(Double.parseDouble(getValorVenta()));
-            listaDetalle.add(detalle);
+            listaDetalles.add(detalle);
         }
     }
 
     @Override
-    public void total() {        
+    public void total() {
         total = new Total();
         obtenerTipoOperacion(getTipoTotal(), getValorSubTotal());
         total.setTotalIGV(Double.parseDouble(getTotalIGV()));
@@ -232,4 +228,14 @@ public class LectorXML extends Xml {
         LOGGER.log(Level.WARNING, LectorEmail.fecha);
         LOGGER.log(Level.WARNING, "*********************");
     }
+
+    public boolean isExiste() {
+        return existe;
+    }
+
+    @Override
+    public void onFail(Etiqueta etiqueta) {
+        etiquetasErradas.put(etiqueta.ordinal(), etiqueta.obtenerEtiqueta());
+    }
+        
 }

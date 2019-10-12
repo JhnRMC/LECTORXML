@@ -1,6 +1,6 @@
 package com.readerxml.controller;
 
-import com.readerxml.util.Log;
+import com.Log;
 import javax.mail.MessagingException;
 import javax.mail.Part;
 import java.io.*;

@@ -1,9 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package com.readerxml.util;
+package com;
 
 import java.util.logging.Logger;
 import java.io.IOException;
@@ -15,16 +10,12 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.SimpleFormatter;
 
-/**
- *
- * @author Sammy Guergachi <sguergachi at gmail.com>
- */
 public class Log {
 
     private final static Logger LOGGER_DTO = java.util.logging.Logger.getLogger("com.readerxml.conexion");
     private final static Logger LOGGER_LECTOR = java.util.logging.Logger.getLogger("com.readerxml");
     private final static Logger LOGGER_DAO = java.util.logging.Logger.getLogger("com.readerxml.dao");
-    private final static Logger LOGGER_RAIZ = java.util.logging.Logger.getLogger("com.readerxml.util");
+    private final static Logger LOGGER_RAIZ = java.util.logging.Logger.getLogger("com");
     private final static Logger LOGGER = java.util.logging.Logger.getLogger(Log.class.getName());
     private final static Logger LOGGER_CONTROLLER = java.util.logging.Logger.getLogger("com.readerxml.controller");
     

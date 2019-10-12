@@ -80,7 +80,6 @@ public class Conexion {
 
     public CallableStatement prepareCall(String sp) throws SQLException {
 
-        //con = DriverManager.getConnection(url, user, pass);
         CallableStatement cs = con.prepareCall(sp);
 
         return cs;
@@ -88,7 +87,6 @@ public class Conexion {
 
     public int executeUpdate() throws SQLException {
 
-        //con = DriverManager.getConnection(url, user, pass);
         Statement st = con.createStatement();
         int nupdate = st.executeUpdate(executeStatement);
 
@@ -97,18 +95,12 @@ public class Conexion {
 
     public int executeUpdate(String query) throws SQLException {
 
-        //con = DriverManager.getConnection(url, user, pass);
         Statement st = con.createStatement();
         int nupdate = st.executeUpdate(query);
 
         return nupdate;
     }
 
-    /**
-     * Returns the executeQuery.
-     *
-     * @return String
-     */
     public String getExecuteStatement() {
         return executeStatement;
     }

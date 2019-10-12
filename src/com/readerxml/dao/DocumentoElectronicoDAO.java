@@ -75,7 +75,6 @@ public class DocumentoElectronicoDAO {
         Cabecera cabecera = documento.getCabecera();
         ArrayList<Detalle> listaDetalles = documento.getDetallesDocumento();
         Total total = documento.getTotal();
-
         try {
             cs = conexion.prepareCall("{call PANAAUTOS.PKG_DOCUMENTOS_ELECTRONICOS.INSERT_CABTOT_DOCELEC(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}");
             cs.setInt(1, cabecera.getTipoDocumento());
@@ -108,7 +107,7 @@ public class DocumentoElectronicoDAO {
                     cs.setInt(1, codigoDocumento);
                     cs.setInt(2, detalle.getItemProducto());
                     cs.setString(3, detalle.getCodProducto());
-                    cs.setString(4, detalle.getDescProducto());
+                    cs.setString(4, detalle.getDescProducto().length() > 190 ? "Contenido no disponible" : detalle.getDescProducto());
                     cs.setDouble(5, detalle.getCantProducto());
                     cs.setDouble(6, detalle.getPrecioUnitarioProducto());
                     cs.setDouble(7, detalle.getValorVentaProducto());

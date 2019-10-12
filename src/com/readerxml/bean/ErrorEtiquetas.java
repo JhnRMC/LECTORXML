@@ -15,7 +15,7 @@ public class ErrorEtiquetas {
     private String email = "";
     private String flag = "";
     private String fecha ="";
-    private String etiqueta_global = "";
+    private String etiquetaGlobal = "";
     private String version = "";
     private String tipoDocumento = "";
     private String numeroDocumento = "";
@@ -50,14 +50,6 @@ public class ErrorEtiquetas {
     private String nodoTotalVenta = "";
     private String totalVenta = "";
 
-    public String getFecha() {
-        return fecha;
-    }
-
-    public void setFecha(String fecha) {
-        this.fecha = fecha;
-    }
-
     public String getAsunto() {
         return asunto;
     }
@@ -82,12 +74,20 @@ public class ErrorEtiquetas {
         this.flag = flag;
     }
 
-    public String getETIQUETA_GLOBAL() {
-        return etiqueta_global;
+    public String getFecha() {
+        return fecha;
     }
 
-    public void setETIQUETA_GLOBAL(String ETIQUETA_GLOBAL) {
-        this.etiqueta_global = ETIQUETA_GLOBAL;
+    public void setFecha(String fecha) {
+        this.fecha = fecha;
+    }
+
+    public String getEtiquetaGlobal() {
+        return etiquetaGlobal;
+    }
+
+    public void setEtiquetaGlobal(String etiquetaGlobal) {
+        this.etiquetaGlobal = etiquetaGlobal;
     }
 
     public String getVersion() {
@@ -353,7 +353,5 @@ public class ErrorEtiquetas {
     public void setTotalVenta(String totalVenta) {
         this.totalVenta = totalVenta;
     }
-    
-    
 
 }
