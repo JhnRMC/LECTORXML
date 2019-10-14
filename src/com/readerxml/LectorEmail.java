@@ -39,7 +39,6 @@ public class LectorEmail {
 
     public LectorEmail() {
         Propiedades.cargarPropiedades();
-        configuracionEmail();
     }
 
     public void configuracionEmail() {
@@ -134,7 +133,7 @@ public class LectorEmail {
     }
 
     public boolean esValidoLaCantidadArchivos() {
-        boolean validacion = archivos.length == 2;
+        boolean validacion = cont == 2;
         if (!validacion) {
             LOGGER.log(Level.WARNING, "EL CORREO NO CONTIENE LA CANTIDAD DE  DOCUMENTOS PARA SU VALIDACION, UN PDF Y XML");
             registrarAvisoDeRechazoCorreo();
@@ -156,12 +155,16 @@ public class LectorEmail {
     }
 
     private void leerArchivo(Part[] archivosAdjuntos) {
+        try{
         lectorXML.iniciarLectura(archivosAdjuntos[0]);
-        leerPDF(archivosAdjuntos[1]);
+        leerPDF(archivosAdjuntos[1]);}
+        catch (NullPointerException ex){
+            System.out.println("NUMERO DE ARCHIVOS ADJUNTOS SUPERA LOS 2 SOLICITUDADOS");
+        }
     }
 
     private void leerPDF(Part archivosAdjuntos) {
-        if (lectorXML.isExiste()) {
+        if (!lectorXML.isExiste()) {
             Archivo.guardarPDF(archivosAdjuntos, lectorXML.documento.getPathPDF());
         }
     }
@@ -208,10 +211,10 @@ public class LectorEmail {
                         leerInfoAdjunto((Multipart) primeraParte.getContent());
                     }
                 } catch (ClassCastException | MessagingException | IOException ex) {
-                    ex.printStackTrace();
+                    /*ex.printStackTrace();
                     String result = new BufferedReader(new InputStreamReader(primeraParte.getInputStream())).lines()
                     .parallel().collect(Collectors.joining("\n"));
-                    System.out.println("RESULTADO: " + result);
+                    System.out.println("RESULTADO: " + result);*/
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
@@ -265,12 +268,14 @@ public class LectorEmail {
 
     public void agregarArchivoLista(Part archivoAdjunto) throws MessagingException {
         String nombreArchivo;
-        System.out.println("ARCHIVO NUMERO: " + (++cont));
         nombreArchivo = archivoAdjunto.getFileName().toLowerCase();
-        System.out.println("NOMBRE ARCHIVO: " + nombreArchivo);
         if (nombreArchivo.endsWith(".xml")) {
+            System.out.println("ARCHIVO NUMERO: " + (++cont));
+            System.out.println("NOMBRE ARCHIVO: " + nombreArchivo);
             archivos[0] = archivoAdjunto;
-        } else {
+        } else if(nombreArchivo.endsWith(".pdf")) {
+            System.out.println("ARCHIVO NUMERO: " + (++cont));
+            System.out.println("NOMBRE ARCHIVO: " + nombreArchivo);
             archivos[1] = archivoAdjunto;
         }
 

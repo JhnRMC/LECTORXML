@@ -27,13 +27,15 @@ public class LectorXML extends Xml implements Xml.Callback {
     Total total;
     ErrorEtiquetas etiquetaErradas;
     HashMap<Integer, String> etiquetasErradas = new HashMap();
+    String ruta;
+    String nombreArchivo;
     private boolean existe = true;
 
     public LectorXML() {
         etiquetaErradas = new ErrorEtiquetas();
     }
 
-    public void iniciarLectura(Part archivo) {
+    public void iniciarLectura(Part archivo) throws NullPointerException {
         System.out.println("=============LECTURA DEL XML===========");
         try {           
             etiquetaValida = true;
@@ -51,8 +53,8 @@ public class LectorXML extends Xml implements Xml.Callback {
 
     }
 
-    public void guardarDocumentoElectronico(Part archivo) {
-        generarPath(archivo);
+    public void guardarDocumentoElectronico(Part archivo) throws NullPointerException {
+        generarPath();
         DocumentoElectronicoDAO documentoElectronicoDAO = new DocumentoElectronicoDAO();
         if (!isEtiquetaValida()) {
             registrarError(Xml.ERROR_ETIQUETA);
@@ -60,6 +62,7 @@ public class LectorXML extends Xml implements Xml.Callback {
         } else {
             if (!existeDocumento(documentoElectronicoDAO)) {
                 System.out.println("REGISTRANDO...");
+                guardarArchivos(archivo);
                 existe = false;
                 documento.setCabecera(cabecera);
                 documento.setTotal(total);
@@ -113,10 +116,9 @@ public class LectorXML extends Xml implements Xml.Callback {
         }*/
     }
 
-    public void generarPath(Part archivo) {
-        String ruta;
+    public void generarPath() throws NullPointerException{
+
         String ruta_SO;
-        String nombreArchivo = null;
         if (isSOWindow()) {
             ruta_SO = "c:/";
         } else {
@@ -130,16 +132,19 @@ public class LectorXML extends Xml implements Xml.Callback {
             nombreArchivo = cabecera.getNroDocumentoEmis() + "-" + cabecera.getCorrelativoDocumento();
             ruta = ruta_SO + "home/proveedores/TD_" + tipoDocumento + "/" + cabecera.getNroDocumentoEmis() + "/" + cabecera.getSerieDocumento() + "-" + cabecera.getCorrelativoDocumento();
         }
+        documento.setPathXML(ruta + "/" + nombreArchivo + ".xml");
+        documento.setPathPDF(ruta + "/" + nombreArchivo + ".pdf");
+        LOGGER.log(Level.INFO, "RUTA GUARDADA XML: {0}", documento.getPathXML());
+        LOGGER.log(Level.INFO, "RUTA GUARDADA PDF: {0}", documento.getPathPDF());
+    }
+
+    public void guardarArchivos(Part archivo){
         File savedir = new File(ruta);
         if (!savedir.exists()) {
             savedir.mkdirs();
         }
-
-        documento.setPathXML(ruta + "/" + nombreArchivo + ".xml");
-        documento.setPathPDF(ruta + "/" + nombreArchivo + ".pdf");
         File savefile = new File(savedir, nombreArchivo + ".xml");
         Archivo.guardarXML(savefile, archivo);
-        LOGGER.log(Level.INFO, "RUTA GUARDADA XML: {0}", documento.getPathXML());
     }
 
     public boolean isSOWindow() {

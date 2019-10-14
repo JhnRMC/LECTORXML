@@ -145,7 +145,8 @@ public abstract class Xml {
             default:
                 etiquetaValida = false;
                 LOGGER.log(Level.SEVERE, "ERROR DE ETIQUETA PRINCIPAL: {0}", etiquetaGlobal);
-                errorEtiquetas.setEtiquetaGlobal(etiquetaGlobal);
+                callback.onFail(Etiqueta.INVOICE);
+                //errorEtiquetas.setEtiquetaGlobal(etiquetaGlobal);
         }
     }
 
@@ -225,8 +226,10 @@ public abstract class Xml {
             String[] validator = null;
             String numDocumento = xml.getElementsByTagName(numeroDocumento).item(i).getTextContent();
             validator = numDocumento.split("-");
-            System.out.println("SERIE Y CORRELATIVO: " + validator[0] + "-" + validator[1]);
-            return validator;
+            if (validator.length == 2) {
+                System.out.println("SERIE Y CORRELATIVO: " + validator[0] + "-" + validator[1]);
+                return validator;
+            }
         }
         etiquetaValida = false;
         LOGGER.log(Level.WARNING, "ERROR EN LA ETIQUETA DE NUMERO DE DOCUMENTO: {0}", numeroDocumento);
@@ -313,7 +316,7 @@ public abstract class Xml {
         } catch (NullPointerException Null_Tipo_Moneda) {
             etiquetaValida = false;
             callback.onFail(Etiqueta.CBC_CUSTOMERASSIGNEDACCOUNTID);
-            errorEtiquetas.setNumeroDocumentoReceptor(numeroDocumentoReceptor);
+            //errorEtiquetas.setNumeroDocumentoReceptor(numeroDocumentoReceptor);
             LOGGER.log(Level.WARNING, "EL XML NO CUENTA CON LA ETIQUETA '<NUMERO DE DOCUMENTO RECEPTOR>'");
         }
         return null;
