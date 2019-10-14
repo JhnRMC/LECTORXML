@@ -13,7 +13,7 @@ public class DBScheduler {
         timer.scheduleAtFixedRate(new Execute(), getTimePrecision(Constants.delay), getTimePrecision(Constants.timetoquery));
     }
 
-    public long getTimePrecision(String value) throws Exception {
+    public long getTimePrecision(String value) {
         long l = 0;
         String val = "";
         try {
@@ -33,12 +33,12 @@ public class DBScheduler {
                 l = Long.parseLong(value);
             }
         } catch (Exception e) {
-            throw new Exception(e);
+            e.printStackTrace();
         }
         return l;
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         Log.registrar();
         try {
             while (true) {

@@ -1,22 +1,17 @@
 package com.readerxml;
 
-import com.readerxml.bean.ErrorEtiquetas;
 import com.readerxml.controller.LectorXML;
 import com.readerxml.controller.Archivo;
 import com.readerxml.controller.Xml;
 import com.Log;
 import com.readerxml.util.Propiedades;
 import javax.mail.*;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 public class LectorEmail {
 
@@ -28,7 +23,7 @@ public class LectorEmail {
     public static String asunto;
     public static String fecha;
     private boolean correosPorLeer;
-    private int cantidadCorreosActual;
+    private int cantidadTotalCorreosActual;
     private int cantidadCorreoSinLeer;
     private final static Logger LOGGER = Logger.getLogger(LectorEmail.class.getName());
     private Message correo;
@@ -69,10 +64,10 @@ public class LectorEmail {
         cantidadCorreosLeidos = Integer.parseInt(Propiedades.propiedades.getProperty("cantidad.msg.buzon.leidos"));
 
         try {
-            cantidadCorreosActual = buzon.getMessageCount();
-            Message[] correos = buzon.getMessages(cantidadCorreosLeidos, cantidadCorreosActual);
+            cantidadTotalCorreosActual = buzon.getMessageCount();
+            Message[] correos = buzon.getMessages(cantidadCorreosLeidos, cantidadTotalCorreosActual);
             cantidadCorreoSinLeer = correos.length;
-            for (int i = 0; i <= cantidadCorreosActual; i++) {
+            for (int i = 0; i <= cantidadTotalCorreosActual; i++) {
                 archivos = new Part[2];
                 correo = correos[i];
                 LectorEmail.email = obtenerCorrero(correo.getFrom()[0].toString());
@@ -135,7 +130,7 @@ public class LectorEmail {
     public boolean esValidoLaCantidadArchivos() {
         boolean validacion = cont == 2;
         if (!validacion) {
-            LOGGER.log(Level.WARNING, "EL CORREO NO CONTIENE LA CANTIDAD DE  DOCUMENTOS PARA SU VALIDACION, UN PDF Y XML");
+            LOGGER.log(Level.WARNING, "EL CORREO ENVIADO, NO CONTIENE LA CANTIDAD DE  DOCUMENTOS PARA SU VALIDACION, UN PDF Y XML");
             registrarAvisoDeRechazoCorreo();
         }
         return validacion;
@@ -178,7 +173,7 @@ public class LectorEmail {
 
     private void mostrarInfoDeEnvio() {
         System.out.println("********************** INICIO-EMAIL ***********************");
-        System.out.println("Email: " + cantidadCorreosLeidos + " de: " + cantidadCorreosActual);
+        System.out.println("Email: " + cantidadCorreosLeidos + " de: " + cantidadTotalCorreosActual);
         System.out.println("Fecha: " + LectorEmail.fecha);
         System.out.println("Asunto: " + LectorEmail.asunto);
         System.out.println("De: " + LectorEmail.email);

@@ -387,7 +387,7 @@ public abstract class Xml {
             //Xml.estado = false;
             callback.onFail(Etiqueta.CBC_DESCRIPTION);
             //errorEtiquetas.setDescripcionProducto(descripcionProducto);
-            //LOGGER.log(Level.INFO, "EL XML NO CUENTA CON LA ETIQUETA '<DESCRIPCION>'");
+            LOGGER.log(Level.INFO, "EL XML NO CUENTA CON LA ETIQUETA '<DESCRIPCION>'");
         }
         return null;
     }
