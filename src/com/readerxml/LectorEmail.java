@@ -7,13 +7,16 @@ import com.readerxml.controller.Xml;
 import com.Log;
 import com.readerxml.util.Propiedades;
 import javax.mail.*;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class LectorEmail {
 
@@ -44,6 +47,7 @@ public class LectorEmail {
         try {
             lectorXML = new LectorXML();
             Session session = Session.getInstance(Propiedades.propiedades);
+            session.setDebug(true);
             Store store = session.getStore(Propiedades.propiedades.getProperty("protocolo.correo"));
             store.connect(Propiedades.propiedades.getProperty("host.name"),
                     Propiedades.propiedades.getProperty("usuario.correo"),
@@ -52,10 +56,8 @@ public class LectorEmail {
             inbox.open(Folder.READ_ONLY);
             emailsNoDeseados = Arrays.asList(Propiedades.propiedades.getProperty("mail.no.deseados").split(","));
             lecturaBuzon(inbox);
-            if (inbox.isOpen()) {
                 inbox.close(false);
                 store.close();
-            }
         } catch (MessagingException ex) {
             ex.printStackTrace();
         } catch (Exception e) {
@@ -197,18 +199,19 @@ public class LectorEmail {
             System.out.println("CANTIDAD DE ARCHIVOS ADJUNTOS(INICIO): " + cantidadArchivosAdjuntos);
             for (int i = 0; i < cantidadArchivosAdjuntos; i++) {
                 try {
+
                     primeraParte = archivosAdjuntos.getBodyPart(i);
                     mostrarDetallesArchivoAdjunto(primeraParte);
-                    if (esCorrectoElDocumento(primeraParte)) {
+                    if ( esCorrectoElFormatoAdjunto() && esCorrectoElDocumento(primeraParte)) {
                         agregarArchivoLista(primeraParte);
                     } else {
                         leerInfoAdjunto((Multipart) primeraParte.getContent());
                     }
                 } catch (ClassCastException | MessagingException | IOException ex) {
                     ex.printStackTrace();
-                    /*String result = new BufferedReader(new InputStreamReader(primeraParte.getInputStream())).lines()
+                    String result = new BufferedReader(new InputStreamReader(primeraParte.getInputStream())).lines()
                     .parallel().collect(Collectors.joining("\n"));
-                    System.out.println("RESULTADO: " + result);*/
+                    System.out.println("RESULTADO: " + result);
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
