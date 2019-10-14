@@ -6,3 +6,5 @@ nbproject/
 build.*
 manifest.*
 .properties
+.idea/
+ReaderXML.iml
