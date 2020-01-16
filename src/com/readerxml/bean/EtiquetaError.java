@@ -10,7 +10,7 @@ package com.readerxml.bean;
  * 
  * @author Sammy Guergachi <sguergachi at gmail.com>
  */
-public class ErrorEtiquetas {
+public class EtiquetaError {
     private String asunto ="";
     private String email = "";
     private String flag = "";

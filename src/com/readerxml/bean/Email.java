@@ -5,32 +5,28 @@
  */
 package com.readerxml.bean;
 
+import java.util.List;
+
 /**
  *
  * @author TechEra-01
  */
 public class Email {
-
-    private String numero;
-    private String emailEmisor;
+    public static final String ETIQUETA_ERRADA="1000";
+    public static final String CORREO_RECHAZADO="2000";
+    private String correo;
     private String fecha;
     private String asunto;
-    private String[] adjuntos;
+    private Adjunto adjunto;
+    private EtiquetaError etiquetaError;
+    private String tipo;
 
-    public String getNumero() {
-        return numero;
+    public String getCorreo() {
+        return correo;
     }
 
-    public void setNumero(String numero) {
-        this.numero = numero;
-    }
-
-    public String getEmailEmisor() {
-        return emailEmisor;
-    }
-
-    public void setEmailEmisor(String emailEmisor) {
-        this.emailEmisor = emailEmisor;
+    public void setCorreo(String correo) {
+        this.correo = correo;
     }
 
     public String getFecha() {
@@ -49,16 +45,32 @@ public class Email {
         this.asunto = asunto;
     }
 
-    public String[] getAdjuntos() {
-        return adjuntos;
+    public String getTipo() {
+        return tipo;
     }
 
-    public void setAdjuntos(String[] adjuntos) {
-        this.adjuntos = adjuntos;
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
+    }
+
+    public Adjunto getAdjunto() {
+        return adjunto;
+    }
+
+    public void setAdjunto(Adjunto adjunto) {
+        this.adjunto = adjunto;
+    }
+
+    public EtiquetaError getEtiquetaError() {
+        return etiquetaError;
+    }
+
+    public void setEtiquetaError(EtiquetaError etiquetaError) {
+        this.etiquetaError = etiquetaError;
     }
 
     @Override
     public String toString() {
-        return "Email{" + "numero=" + numero + ", emailEmisor=" + emailEmisor + ", fecha=" + fecha + ", asunto=" + asunto + ", adjuntos=" + adjuntos + '}';
+        return "Email{" + ", emailEmisor=" + correo + ", fecha=" + fecha + ", asunto=" + asunto + ", adjuntos=" + adjunto + '}';
     }
 }

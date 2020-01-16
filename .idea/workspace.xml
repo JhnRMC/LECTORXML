@@ -3,13 +3,12 @@
   <component name="ChangeListManager">
     <list default="true" id="dfee0788-e93f-407f-8bec-8f0919f04af7" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config_service_email.properties" beforeDir="false" afterPath="$PROJECT_DIR$/config_service_email.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/ReaderXML/com/readerxml/DBScheduler.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/ReaderXML/com/readerxml/DBScheduler.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/ReaderXML/com/readerxml/LectorEmail.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/ReaderXML/com/readerxml/LectorEmail.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/ReaderXML/com/readerxml/controller/Xml.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/ReaderXML/com/readerxml/controller/Xml.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/readerxml/DBScheduler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/readerxml/DBScheduler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/readerxml/LectorEmail.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/readerxml/LectorEmail.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/readerxml/bean/Email.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/readerxml/bean/Email.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/readerxml/bean/EmailSend.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/readerxml/bean/EmailSend.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/readerxml/bean/ErrorEtiquetas.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/readerxml/controller/LectorXML.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/readerxml/controller/LectorXML.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/readerxml/controller/Xml.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/readerxml/controller/Xml.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/readerxml/dao/SendEmailSqliteDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/readerxml/dao/SendEmailSqliteDAO.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -19,6 +18,13 @@
   </component>
   <component name="DefaultGradleProjectSettings">
     <option name="isMigrated" value="true" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
@@ -35,7 +41,9 @@
       </set>
     </option>
   </component>
+  <component name="ProjectId" id="1SOPEgfvZ0EgGwr5XzCMtLMWAyw" />
   <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="ASKED_SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
@@ -80,12 +88,13 @@
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="551b9890-d189-4be5-afe1-8f2ff5e73e0e" name="Default Changelist" comment="" />
+      <changelist id="dfee0788-e93f-407f-8bec-8f0919f04af7" name="Default Changelist" comment="" />
       <created>1571024670694</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1571024670694</updated>
       <workItem from="1571024682840" duration="7920000" />
+      <workItem from="1571431561232" duration="4296000" />
     </task>
     <servers />
   </component>
@@ -97,25 +106,13 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
           </value>
         </entry>
       </map>
     </option>
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-method">
-          <url>file://$PROJECT_DIR$/src/com/readerxml/controller/LectorXML.java</url>
-          <line>155</line>
-          <properties class="com.readerxml.controller.LectorXML" method="cabecera">
-            <option name="EMULATED" value="true" />
-          </properties>
-          <option name="timeStamp" value="12" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
   <component name="masterDetails">
     <states>

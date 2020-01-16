@@ -1,45 +1,37 @@
 package com.readerxml.controller;
 
+import com.readerxml.bean.*;
 import com.readerxml.dao.SendEmailSqliteDAO;
 import com.readerxml.dao.DocumentoElectronicoDAO;
-import com.readerxml.bean.Documento;
-import com.readerxml.bean.Detalle;
-import com.readerxml.bean.Cabecera;
+
 import javax.mail.Part;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import com.readerxml.LectorEmail;
-import com.readerxml.bean.EmailSend;
-import com.readerxml.bean.Total;
-import com.readerxml.bean.ErrorEtiquetas;
-import com.readerxml.util.Etiqueta;
-import java.util.HashMap;
 
-public class LectorXML extends Xml implements Xml.Callback {
-
+public class LectorXML extends Xml {
+    private String pathCanonico;
     private final static Logger LOGGER = Logger.getLogger(LectorXML.class.getName());
     public Documento documento;
     Cabecera cabecera;
     Detalle detalle;
     ArrayList<Detalle> listaDetalles;
     Total total;
-    ErrorEtiquetas etiquetaErradas;
-    HashMap<Integer, String> etiquetasErradas = new HashMap();
+    //ErrorEtiquetas etiquetaErradas;
     String ruta;
     String nombreArchivo;
     private boolean existe = true;
 
     public LectorXML() {
-        etiquetaErradas = new ErrorEtiquetas();
     }
 
     public void iniciarLectura(Part archivo) throws NullPointerException {
         System.out.println("=============LECTURA DEL XML===========");
         try {           
             etiquetaValida = true;
-            super.iniciar(archivo, this);
+            super.iniciar(archivo);
             cabecera();
             emisor();
             receptor();
@@ -57,7 +49,7 @@ public class LectorXML extends Xml implements Xml.Callback {
         generarPath();
         DocumentoElectronicoDAO documentoElectronicoDAO = new DocumentoElectronicoDAO();
         if (!isEtiquetaValida()) {
-            registrarError(Xml.ERROR_ETIQUETA);
+            registrarAlertaCorreo(Email.ETIQUETA_ERRADA);
             registrarErrorLog();
         } else {
             if (!existeDocumento(documentoElectronicoDAO)) {
@@ -83,37 +75,23 @@ public class LectorXML extends Xml implements Xml.Callback {
                 cabecera.getTipoDocumento()
         );
     }
-
-    public void registrarError(int tipoError) {
-        EmailSend emailSend = new EmailSend();
-        emailSend.setAsunto("REGISTRO DE ERRORES");
-        emailSend.setNombreArchivo(LectorEmail.flag + ".xml");
-        emailSend.setRutaArchivo(documento.getPathXML());
-        emailSend.setDestino(LectorEmail.email);
-        emailSend.setTipoMensaje(tipoError);
+    public void registrarAlertaCorreo(String tipoAlerta){
         SendEmailSqliteDAO dao = new SendEmailSqliteDAO();
-        LOGGER.log(Level.WARNING, "REGISTRO ERROR: {0}", emailSend.getAsunto());
-        /*if (dao.registrarSuccessEnvioCorreo(emailSend, errorEtiquetas)) {
+        Email email = new Email();
+        Adjunto adjunto = new Adjunto();
+        adjunto.setNombre(LectorEmail.flag);
+        adjunto.setPath(pathCanonico);
+        email.setCorreo(LectorEmail.email);
+        email.setAsunto(LectorEmail.asunto);
+        email.setFecha(LectorEmail.fecha);
+        email.setTipo(tipoAlerta);
+        email.setEtiquetaError(getEtiquetaError());
+        email.setAdjunto(adjunto);
+         if (dao.registrarSuccessEnvioCorreo(email)) {
             LOGGER.log(Level.WARNING, "REGISTRO EXITOSO, PARA EL ENVIO DE CORREO");
         } else {
             LOGGER.log(Level.WARNING, "ERROR EN EL REGISTRO, PARA EL ENVIO DE CORREO");
-        }*/
-    }
-
-    public void registrarAviso(int tipoError) {
-        EmailSend emailSend = new EmailSend();
-        emailSend.setAsunto("AVISO DE RECHAZO DE CORREO");
-        emailSend.setDestino(LectorEmail.email);
-        emailSend.setNombreArchivo("");
-        emailSend.setRutaArchivo("");
-        emailSend.setTipoMensaje(tipoError);
-        SendEmailSqliteDAO dao = new SendEmailSqliteDAO();
-        LOGGER.log(Level.WARNING, "REGISTRO ERROR: {0}", emailSend.getAsunto());
-        /*if (dao.registrarSuccessEnvioCorreo(emailSend, errorEtiquetas)) {
-            LOGGER.log(Level.WARNING, "REGISTRO EXITOSO, PARA EL ENVIO DE CORREO");
-        } else {
-            LOGGER.log(Level.WARNING, "ERROR EN EL REGISTRO, PARA EL ENVIO DE CORREO");
-        }*/
+        }
     }
 
     public void generarPath() throws NullPointerException{
@@ -126,14 +104,15 @@ public class LectorXML extends Xml implements Xml.Callback {
         }
 
         if (!isEtiquetaValida()) {
-            ruta = ruta_SO + "home/error";
+            ruta = ruta_SO + "home/error/";
             nombreArchivo = LectorEmail.flag;
         } else {
             nombreArchivo = cabecera.getNroDocumentoEmis() + "-" + cabecera.getCorrelativoDocumento();
-            ruta = ruta_SO + "home/proveedores/TD_" + tipoDocumento + "/" + cabecera.getNroDocumentoEmis() + "/" + cabecera.getSerieDocumento() + "-" + cabecera.getCorrelativoDocumento();
+            ruta = ruta_SO + "home/proveedores/TD_" + tipoDocumento + "/" + cabecera.getNroDocumentoEmis() + "/" + cabecera.getSerieDocumento() + "-" + cabecera.getCorrelativoDocumento() + "/";
         }
-        documento.setPathXML(ruta + "/" + nombreArchivo + ".xml");
-        documento.setPathPDF(ruta + "/" + nombreArchivo + ".pdf");
+        pathCanonico = ruta + nombreArchivo;
+        documento.setPathXML(pathCanonico + ".xml");
+        documento.setPathPDF(pathCanonico + ".pdf");
         LOGGER.log(Level.INFO, "RUTA GUARDADA XML: {0}", documento.getPathXML());
         LOGGER.log(Level.INFO, "RUTA GUARDADA PDF: {0}", documento.getPathPDF());
     }
@@ -238,9 +217,7 @@ public class LectorXML extends Xml implements Xml.Callback {
         return existe;
     }
 
-    @Override
-    public void onFail(Etiqueta etiqueta) {
-        etiquetasErradas.put(etiqueta.ordinal(), etiqueta.obtenerEtiqueta());
+    public String getPathCanonico() {
+        return pathCanonico;
     }
-        
 }

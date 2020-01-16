@@ -1,7 +1,7 @@
 package com.readerxml.controller;
 
 import com.Log;
-import com.readerxml.bean.ErrorEtiquetas;
+import com.readerxml.bean.EtiquetaError;
 import com.readerxml.util.Etiqueta;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -57,18 +57,15 @@ public abstract class Xml {
     protected String nodoTotalVenta = Etiqueta.CAC_LEGALMONETARYTOTAL.obtenerEtiqueta();
     protected String totalVenta = Etiqueta.CBC_PAYABLEAMOUNT.obtenerEtiqueta();
     protected boolean etiquetaValida;
-    private ErrorEtiquetas errorEtiquetas;
-    public static int ERROR_AVISO = 0;
-    public static int ERROR_ETIQUETA = 1;
-    private Xml.Callback callback;
+    private EtiquetaError etiquetaError;
     private XmlBuilder xmlBuilder;
     private final static Logger LOGGER = Logger.getLogger(Xml.class.getName());
 
-    protected void iniciar(Part xml, Xml.Callback callback) {
-        this.callback = callback;
+    protected void iniciar(Part xml) {
         generarDocumento(xml);
         obtenerVersion();
         generarEtiquetas();
+    
     }
 
     private void generarDocumento(Part xml) {
@@ -145,8 +142,7 @@ public abstract class Xml {
             default:
                 etiquetaValida = false;
                 LOGGER.log(Level.SEVERE, "ERROR DE ETIQUETA PRINCIPAL: {0}", etiquetaGlobal);
-                callback.onFail(Etiqueta.INVOICE);
-                //errorEtiquetas.setEtiquetaGlobal(etiquetaGlobal);
+                etiquetaError.setEtiquetaGlobal(etiquetaGlobal);
         }
     }
 
@@ -219,9 +215,7 @@ public abstract class Xml {
     }
 
     protected String[] getNumeroDocumento() {
-
         NodeList lista = xml.getElementsByTagName(numeroDocumento);
-
         for (int i = 0; i < lista.getLength(); i++) {
             String[] validator = null;
             String numDocumento = xml.getElementsByTagName(numeroDocumento).item(i).getTextContent();
@@ -233,8 +227,7 @@ public abstract class Xml {
         }
         etiquetaValida = false;
         LOGGER.log(Level.WARNING, "ERROR EN LA ETIQUETA DE NUMERO DE DOCUMENTO: {0}", numeroDocumento);
-        callback.onFail(Etiqueta.CBC_ID);
-        //errorEtiquetas.setNumeroDocumento(numeroDocumento);
+        etiquetaError.setNumeroDocumento(numeroDocumento);
         return new String[]{"NO_FOUND", "NO_FOUND"};
 
     }
@@ -244,8 +237,7 @@ public abstract class Xml {
             return xmlBuilder.etiqueta(tipoMoneda).builder();
         } catch (NullPointerException tipo_moneda) {
             etiquetaValida = false;
-            callback.onFail(Etiqueta.DOCUMENTCURRENCYCODE);
-            //errorEtiquetas.setTipoMoneda(tipoMoneda);
+            etiquetaError.setTipoMoneda(tipoMoneda);
             LOGGER.log(Level.WARNING, "EL XML NO CUENTA CON LA ETIQUETA TIPO DE MONEDA ( cbc:DocumentCurrencyCode )");
         }
         return null;
@@ -261,8 +253,7 @@ public abstract class Xml {
             return value;
         } catch (NullPointerException fecha_emision) {
             etiquetaValida = false;
-            callback.onFail(Etiqueta.CBC_ISSUEDATE);
-            //errorEtiquetas.setFechaEmision(fechaEmision);
+            etiquetaError.setFechaEmision(fechaEmision);
             LOGGER.log(Level.WARNING, "EL XML NO CUENTA CON LA ETIQUETA FECHA DE EMISION ( cbc:IssueDate )");
         }
         return null;
@@ -276,8 +267,7 @@ public abstract class Xml {
                     .etiquetaAnidada(numeroDocumentoEmisor);
         } catch (NullPointerException documento_emisor) {
             etiquetaValida = false;
-            callback.onFail(Etiqueta.CBC_CUSTOMERASSIGNEDACCOUNTID);
-            //errorEtiquetas.setNumeroDocumentoEmisor(numeroDocumentoEmisor);
+            etiquetaError.setNumeroDocumentoEmisor(numeroDocumentoEmisor);
             LOGGER.log(Level.WARNING, "EL XML NO CUENTA CON LA ETIQUETA '<NUMERO DE DOCUMENTO EMISOR>'.");
         }
         return null;
@@ -301,8 +291,7 @@ public abstract class Xml {
                     .etiqueta(nombreEmisor).builder();
         } catch (NullPointerException nombre_emisor) {
             //etiquetaValida = false;
-            callback.onFail(Etiqueta.CBC_REGISTRATIONNAME);
-            //errorEtiquetas.setNombreEmisor(nombreEmisor);
+            etiquetaError.setNombreEmisor(nombreEmisor);
             LOGGER.log(Level.WARNING, "EL XML NO CUENTA CON LA ETIQUETA '<cbc:RegistrationName>'");
         }
         return null;
@@ -315,8 +304,7 @@ public abstract class Xml {
                     .etiquetaAnidada(numeroDocumentoReceptor);
         } catch (NullPointerException Null_Tipo_Moneda) {
             etiquetaValida = false;
-            callback.onFail(Etiqueta.CBC_CUSTOMERASSIGNEDACCOUNTID);
-            //errorEtiquetas.setNumeroDocumentoReceptor(numeroDocumentoReceptor);
+            etiquetaError.setNumeroDocumentoReceptor(numeroDocumentoReceptor);
             LOGGER.log(Level.WARNING, "EL XML NO CUENTA CON LA ETIQUETA '<NUMERO DE DOCUMENTO RECEPTOR>'");
         }
         return null;
@@ -339,8 +327,7 @@ public abstract class Xml {
                     .etiquetaAnidada(nombreReceptor);
         } catch (NullPointerException Null_Tipo_Moneda) {
             //etiquetaValida = false;
-            callback.onFail(Etiqueta.CBC_REGISTRATIONNAME);
-            //errorEtiquetas.setNombreReceptor(nombreReceptor);
+            etiquetaError.setNombreReceptor(nombreReceptor);
             LOGGER.log(Level.WARNING, "EL XML NO CUENTA CON LA ETIQUETA '<NOMBRE DEL RECEPTOR>'");
         }
         return null;
@@ -361,8 +348,7 @@ public abstract class Xml {
         try {
             return elemento.getElementsByTagName(codigoItem).item(0).getTextContent();
         } catch (NullPointerException Null_Tipo_Moneda) {
-            callback.onFail(Etiqueta.CBC_ID);
-            //errorEtiquetas.setCodigoitem(codigoItem);
+            etiquetaError.setCodigoitem(codigoItem);
             LOGGER.log(Level.WARNING, "EL XML NO CUENTA CON LA ETIQUETA '<NUMERO ITEM>'");
         }
         return null;
@@ -373,8 +359,7 @@ public abstract class Xml {
             return (tipoDocumento.equals("01") ? ((Element) elemento.getElementsByTagName(nodoCodigoProducto).item(0)) : elemento).getElementsByTagName(codigoProducto).item(0).getTextContent();
         } catch (NullPointerException Null_Tipo_Moneda) {
             //Xml.estado = false;
-            callback.onFail(Etiqueta.CBC_ID);
-            //errorEtiquetas.setCodigoProducto(codigoProducto);
+            etiquetaError.setCodigoProducto(codigoProducto);
             LOGGER.log(Level.INFO, "EL XML NO CUENTA CON LA ETIQUETA '<CODIGO PRODUCTO>'");
         }
         return null;
@@ -385,8 +370,7 @@ public abstract class Xml {
             return elemento.getElementsByTagName(descripcionProducto).item(0).getTextContent();
         } catch (NullPointerException Null_Tipo_Moneda) {
             //Xml.estado = false;
-            callback.onFail(Etiqueta.CBC_DESCRIPTION);
-            //errorEtiquetas.setDescripcionProducto(descripcionProducto);
+            etiquetaError.setDescripcionProducto(descripcionProducto);
             LOGGER.log(Level.INFO, "EL XML NO CUENTA CON LA ETIQUETA '<DESCRIPCION>'");
         }
         return null;
@@ -397,8 +381,7 @@ public abstract class Xml {
             return elemento.getElementsByTagName(cantidadProducto).item(0).getTextContent();
         } catch (NullPointerException Null_Tipo_Moneda) {
             etiquetaValida = false;
-            callback.onFail(Etiqueta.CBC_INVOICEDQUANTITY);
-            //errorEtiquetas.setCantidadProducto(cantidadProducto);
+            etiquetaError.setCantidadProducto(cantidadProducto);
             LOGGER.log(Level.WARNING, "EL XML NO CUENTA CON LA ETIQUETA '<CANTIDAD>'");
         }
         return null;
@@ -409,8 +392,7 @@ public abstract class Xml {
             return (tipoDocumento.equals("01") ? ((Element) elemento.getElementsByTagName(nodoPrecioProducto).item(0)) : elemento).getElementsByTagName(precioProducto).item(0).getTextContent();
         } catch (NullPointerException Null_Tipo_Moneda) {
             etiquetaValida = false;
-            callback.onFail(Etiqueta.CBC_PRICEAMOUNT);
-            //errorEtiquetas.setPrecioProducto(precioProducto);
+            etiquetaError.setPrecioProducto(precioProducto);
             LOGGER.log(Level.WARNING, "EL XML NO CUENTA CON LA ETIQUETA '<PRECIO>'");
         }
         return "0.0";
@@ -421,8 +403,7 @@ public abstract class Xml {
             return elemento.getElementsByTagName(valorVenta).item(0).getTextContent();
         } catch (NullPointerException Null_Tipo_Moneda) {
             etiquetaValida = false;
-            callback.onFail(Etiqueta.CBC_LINEEXTENSIONAMOUNT);
-            //errorEtiquetas.setValorVenta(valorVenta);
+            etiquetaError.setValorVenta(valorVenta);
             LOGGER.log(Level.WARNING, "EL XML NO CUENTA CON LA ETIQUETA '<VALOR DE VENTA>'");
         }
         return "0.0";
@@ -449,8 +430,7 @@ public abstract class Xml {
             return xmlBuilder.nodo().elemento(nodoTotalIGV).etiquetaAnidada(totalIGV);
         } catch (NullPointerException Null_Tipo_Moneda) {
             etiquetaValida = false;
-            callback.onFail(Etiqueta.CBC_TAXAMOUNT);
-            //errorEtiquetas.setTotalIGV(totalIGV);
+            etiquetaError.setTotalIGV(totalIGV);
             LOGGER.log(Level.WARNING, "EL XML NO CUENTA CON LA ETIQUETA '<TOTAL DE I.G.V>'");
         }
         return "0";
@@ -461,8 +441,7 @@ public abstract class Xml {
             return xmlBuilder.nodo().elemento(nodoTotalVenta).etiquetaAnidada(totalVenta);
         } catch (NullPointerException Null_Tipo_Moneda) {
             etiquetaValida = false;
-            callback.onFail(Etiqueta.CBC_PAYABLEAMOUNT);
-            //errorEtiquetas.setTotalVenta(totalVenta);
+            etiquetaError.setTotalVenta(totalVenta);
             LOGGER.log(Level.WARNING, "EL XML NO CUENTA CON LA ETIQUETA '<TOTAL DE VENTA>'");
         }
         return "0";
@@ -482,8 +461,8 @@ public abstract class Xml {
         return etiquetaValida;
     }
 
-    interface Callback {
-
-        void onFail(Etiqueta etiqueta);
+    public EtiquetaError getEtiquetaError(){
+        return etiquetaError;
     }
+
 }
