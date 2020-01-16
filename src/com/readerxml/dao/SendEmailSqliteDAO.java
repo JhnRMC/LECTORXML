@@ -5,6 +5,7 @@
  */
 package com.readerxml.dao;
 
+import com.readerxml.bean.Email;
 import com.readerxml.bean.ErrorEtiquetas;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -14,6 +15,7 @@ import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import com.readerxml.bean.EmailSend;
+import com.readerxml.bean.EtiquetaError;
 import com.readerxml.util.Propiedades;
 
 /**
@@ -28,19 +30,19 @@ public class SendEmailSqliteDAO {
     //String lite = "D:\\lite.db";
     String url = "jdbc:sqlite:" + pathSqlite;
 
-    public boolean registrarSuccessEnvioCorreo(EmailSend emailSend, ErrorEtiquetas error) {
+    public boolean registrarSuccessEnvioCorreo(Email emailSend) {
         boolean status = false;
         Connection conn = null;
         Statement stmt;
         try {
             conn = DriverManager.getConnection(url);
             conn.setAutoCommit(false);
-            int idMensaje = registrarErrores(error);
+            int idMensaje = registrarErrores(emailSend.getEtiquetaError());
             stmt = conn.createStatement();
 
-            String sql = "INSERT INTO CORREO (ASUNTO,DESTINATARIO,MENSAJE,NOMBRE_ADJUNTO1,ADJUNTO1,NOMBRE_ADJUNTO2,ADJUNTO2,ERROR, ESTADO)"
-                    + "VALUES ('" + emailSend.getAsunto() + "','" + emailSend.getDestino() + "'," + idMensaje + ",'" + emailSend.getNombreArchivo() + "'"
-                    + ",'" + emailSend.getRutaArchivo() + "','" + emailSend.getNombreArchivo2() + "','" + emailSend.getRutaArchivo2() + "'," + emailSend.getTipoMensaje() + ",0);";
+            String sql = "INSERT INTO CORREO (DESTINATARIO,ASUNTO,FECHA,MENSAJE, NOMBRE_ADJUNTO, ARCHIVO_ADJUNTO, ERROR, ESTADO)"
+                    + "VALUES ('" + emailSend.getCorreo() + "','" + emailSend.getAsunto() + "'," + idMensaje + ",'" + emailSend.getAdjunto().getNombre() + "'"
+                    + ",'" + emailSend.getAdjunto().getPath() + "'," + emailSend.getTipo() + ",0)";
             stmt.executeUpdate(sql);
             conn.commit();
             stmt.close();
@@ -59,7 +61,7 @@ public class SendEmailSqliteDAO {
         return status;
     }
 
-    private int registrarErrores(ErrorEtiquetas error) {
+    private int registrarErrores(EtiquetaError error) {
 
         Connection conn = null;
         Statement stmt = null;
@@ -90,7 +92,7 @@ public class SendEmailSqliteDAO {
                     + "email,"
                     + "asunto,"
                     + "fecha_correo)"
-                    + "VALUES('" + error.getETIQUETA_GLOBAL() + "','"
+                    + "VALUES('" + error.getEtiquetaGlobal()+ "','"
                     + error.getNumeroDocumento() + "','"
                     + error.getTipoMoneda() + "','"
                     + error.getFechaEmision() + "','"

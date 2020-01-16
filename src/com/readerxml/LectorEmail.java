@@ -1,20 +1,19 @@
 package com.readerxml;
 
-import com.readerxml.bean.ErrorEtiquetas;
 import com.readerxml.controller.LectorXML;
 import com.readerxml.controller.Archivo;
 import com.readerxml.controller.Xml;
-import com.readerxml.util.Log;
+import com.Log;
 import com.readerxml.util.Propiedades;
 import javax.mail.*;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class LectorEmail extends Thread {
+public class LectorEmail {
 
     private LectorXML lectorXML;
     public static int cantidadCorreosLeidos;
@@ -23,29 +22,18 @@ public class LectorEmail extends Thread {
     public static String flag;
     public static String asunto;
     public static String fecha;
-    private static LectorEmail lectorEmail;
-    private boolean isValidoElCorreo;
-    private int cantidadCorreosActual;
+    private boolean correosPorLeer;
+    private int cantidadTotalCorreosActual;
+    private int cantidadCorreoSinLeer;
     private final static Logger LOGGER = Logger.getLogger(LectorEmail.class.getName());
     private Message correo;
     private int cont = 0;
-    private List<Part> archivos;
+    private Part[] archivos;
+    private boolean correoValido;
+    private List<String> emailsNoDeseados;
 
     public LectorEmail() {
         Propiedades.cargarPropiedades();
-        Log.registrar();
-    }
-
-    public static void main(String[] args) {
-        lectorEmail = new LectorEmail();
-        lectorEmail.start();
-    }
-
-    @Override
-    public void run() {
-        while (true) {
-            configuracionEmail();
-        }
     }
 
     public void configuracionEmail() {
@@ -53,17 +41,17 @@ public class LectorEmail extends Thread {
         try {
             lectorXML = new LectorXML();
             Session session = Session.getInstance(Propiedades.propiedades);
+            session.setDebug(true);
             Store store = session.getStore(Propiedades.propiedades.getProperty("protocolo.correo"));
             store.connect(Propiedades.propiedades.getProperty("host.name"),
                     Propiedades.propiedades.getProperty("usuario.correo"),
                     Propiedades.propiedades.getProperty("password.correo"));
             Folder inbox = store.getFolder("INBOX");
             inbox.open(Folder.READ_ONLY);
-            lecturaBuzon(inbox.getMessages());
-            if (inbox.isOpen()) {
+            emailsNoDeseados = Arrays.asList(Propiedades.propiedades.getProperty("mail.no.deseados").split(","));
+            lecturaBuzon(inbox);
                 inbox.close(false);
                 store.close();
-            }
         } catch (MessagingException ex) {
             ex.printStackTrace();
         } catch (Exception e) {
@@ -71,26 +59,28 @@ public class LectorEmail extends Thread {
         }
     }
 
-    public void lecturaBuzon(Message[] correos) {
+    public void lecturaBuzon(Folder buzon) {
 
         cantidadCorreosLeidos = Integer.parseInt(Propiedades.propiedades.getProperty("cantidad.msg.buzon.leidos"));
-        try {
 
-            cantidadCorreosActual = correos.length;
-            for (int i = cantidadCorreosLeidos; i <= cantidadCorreosActual; i++) {
-                archivos = new ArrayList();
+        try {
+            cantidadTotalCorreosActual = buzon.getMessageCount();
+            Message[] correos = buzon.getMessages(cantidadCorreosLeidos, cantidadTotalCorreosActual);
+            cantidadCorreoSinLeer = correos.length;
+            for (int i = 0; i <= cantidadTotalCorreosActual; i++) {
+                archivos = new Part[2];
                 correo = correos[i];
                 LectorEmail.email = obtenerCorrero(correo.getFrom()[0].toString());
-                isValidoElCorreo = true;
-                if (!LectorEmail.email.equalsIgnoreCase(Propiedades.propiedades.getProperty("usuario.correo"))) {
+                correosPorLeer = true;
+                validarCorreros();
+                if (!correoValido) {
                     cargarDatosDelRemitente();
                     mostrarInfoDeEnvio();
                     if (esCorrectoElFormatoAdjunto()) {
                         Multipart archivosAdjuntos = (Multipart) correo.getContent();
                         leerInfoAdjunto(archivosAdjuntos);
                         if (esValidoLaCantidadArchivos()) {
-                            archivos.forEach(archivo -> leerXML(archivo));
-                            archivos.forEach(archivo -> leerPDF(archivo));
+                            leerArchivo(archivos);
                         }
                     }
                 }
@@ -106,31 +96,41 @@ public class LectorEmail extends Thread {
                 Logger.getLogger(LectorEmail.class.getName()).log(Level.SEVERE, null, ex);
             }
         } catch (IOException error_content) {
+            error_content.printStackTrace();
             LOGGER.log(Level.SEVERE, "ERROR EN EL CONTENIDO");
         } catch (MessagingException ex) {
+            ex.printStackTrace();
             LOGGER.log(Level.SEVERE, "ERROR EN LECTURA DEL ARCHIVO ADJUNTO DEL CORREO{0}", Log.getStackTrace(ex));
         } catch (ArrayIndexOutOfBoundsException indexEx) {
-            if (isValidoElCorreo) {
+            if (correosPorLeer) {
+                indexEx.printStackTrace();
                 LOGGER.log(Level.INFO, "A LA ESPERA DE NUEVOS CORREOS...");
-                isValidoElCorreo = false;
+                correosPorLeer = false;
             } else {
                 System.out.println("Fecha: " + new Date());
             }
         } catch (IllegalStateException illegalEx) {
+            illegalEx.printStackTrace();
             LOGGER.log(Level.SEVERE, "PROBLEMAS EN LA CONFIGURACION DE APERTURA DEL BUZON, SE REALIZA RECONFIGURACION.");
             configuracionEmail();
         } catch (Exception ex) {
             ex.printStackTrace();
-        } finally {
-            Runtime garbage = Runtime.getRuntime();
-            garbage.gc();
         }
     }
 
+    public void validarCorreros() {
+
+        emailsNoDeseados.forEach(emailNoDeseado -> {
+            if (LectorEmail.email.contains(emailNoDeseado)) {
+                correoValido = true;
+            }
+        });
+    }
+
     public boolean esValidoLaCantidadArchivos() {
-        boolean validacion = archivos.size() == 2;
+        boolean validacion = cont == 2;
         if (!validacion) {
-            LOGGER.log(Level.WARNING, "EL CORREO NO CONTIENE LA CANTIDAD DE  DOCUMENTOS PARA SU VALIDACION, UN PDF Y XML");
+            LOGGER.log(Level.WARNING, "EL CORREO ENVIADO, NO CONTIENE LA CANTIDAD DE  DOCUMENTOS PARA SU VALIDACION, UN PDF Y XML");
             registrarAvisoDeRechazoCorreo();
         }
         return validacion;
@@ -146,38 +146,21 @@ public class LectorEmail extends Thread {
         LOGGER.log(Level.WARNING, "ASUNTO DEL CORREO: {0}", LectorEmail.asunto);
         LOGGER.log(Level.WARNING, "FECHA REMITIDA: {0}", LectorEmail.fecha);
         LOGGER.log(Level.WARNING, "***********");
-        Xml.estado = false;
         lectorXML.registrarAviso(Xml.ERROR_AVISO);
     }
 
-    private void leerXML(Part archivosAdjuntos) {
-        String nombreArchivo;
-        try {
-            nombreArchivo = archivosAdjuntos.getFileName().toLowerCase();
-            if (nombreArchivo.endsWith(".xml")) {
-                lectorXML.iniciarLectura(archivosAdjuntos);
-            }
-        } catch (MessagingException ex) {
-            ex.printStackTrace();
-        } catch (NullPointerException ex) {
-            ex.printStackTrace();
+    private void leerArchivo(Part[] archivosAdjuntos) {
+        try{
+        lectorXML.iniciarLectura(archivosAdjuntos[0]);
+        leerPDF(archivosAdjuntos[1]);}
+        catch (NullPointerException ex){
+            System.out.println("NUMERO DE ARCHIVOS ADJUNTOS SUPERA LOS 2 SOLICITUDADOS");
         }
     }
 
     private void leerPDF(Part archivosAdjuntos) {
-        String nombreArchivo;
-        try {
-            nombreArchivo = archivosAdjuntos.getFileName().toLowerCase();
-            if (!LectorXML.existe) {
-                nombreArchivo = archivosAdjuntos.getFileName().toLowerCase();
-                if (nombreArchivo.endsWith(".pdf") && !LectorXML.existe) {
-                    Archivo.guardarPDF(archivosAdjuntos, lectorXML.documento.getPathPDF());
-                }
-            }
-        } catch (MessagingException ex) {
-            ex.printStackTrace();
-        } catch (NullPointerException ex) {
-
+        if (!lectorXML.isExiste()) {
+            Archivo.guardarPDF(archivosAdjuntos, lectorXML.documento.getPathPDF());
         }
     }
 
@@ -186,15 +169,11 @@ public class LectorEmail extends Thread {
         LectorEmail.flag = fechaEmision.getYear() + "-" + fechaEmision.getMonth() + "-" + fechaEmision.getMinutes() + "-" + fechaEmision.getTime();
         LectorEmail.asunto = correo.getSubject();
         LectorEmail.fecha = fechaEmision.toLocaleString();
-        Xml.errorEtiquetas = new ErrorEtiquetas();
-        Xml.errorEtiquetas.setFecha(LectorEmail.fecha);
-        Xml.errorEtiquetas.setAsunto(LectorEmail.asunto);
-        Xml.errorEtiquetas.setEmail(LectorEmail.email);
     }
 
     private void mostrarInfoDeEnvio() {
         System.out.println("********************** INICIO-EMAIL ***********************");
-        System.out.println("Email: " + correo.getMessageNumber() + " de: " + cantidadCorreosActual);
+        System.out.println("Email: " + cantidadCorreosLeidos + " de: " + cantidadTotalCorreosActual);
         System.out.println("Fecha: " + LectorEmail.fecha);
         System.out.println("Asunto: " + LectorEmail.asunto);
         System.out.println("De: " + LectorEmail.email);
@@ -205,41 +184,56 @@ public class LectorEmail extends Thread {
         try {
             tipoMime = !correo.isMimeType("text/*");
         } catch (MessagingException ex) {
-            Logger.getLogger(LectorEmail.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
         }
         return tipoMime;
     }
 
-    private void leerInfoAdjunto(Multipart archivosAdjuntos) throws MessagingException, IOException {
-        Part primeraParte = null;
-        cont = 0;
-        int cantidadArchivosAdjuntos = archivosAdjuntos.getCount();
-        for (int i = 0; i < cantidadArchivosAdjuntos; i++) {
-            try {
-                primeraParte = archivosAdjuntos.getBodyPart(i);
-                if (esCorrectoElDocumento(primeraParte)) {
-                    agregarArchivoLista(primeraParte);
-                } else {
-                    leerInfoAdjunto((Multipart) primeraParte.getContent());
+    private void leerInfoAdjunto(Multipart archivosAdjuntos) {
+        try {
+            Part primeraParte = null;
+            cont = 0;
+            int cantidadArchivosAdjuntos = archivosAdjuntos.getCount();
+            System.out.println("CANTIDAD DE ARCHIVOS ADJUNTOS(INICIO): " + cantidadArchivosAdjuntos);
+            for (int i = 0; i < cantidadArchivosAdjuntos; i++) {
+                try {
+
+                    primeraParte = archivosAdjuntos.getBodyPart(i);
+                    mostrarDetallesArchivoAdjunto(primeraParte);
+                    if ( esCorrectoElFormatoAdjunto() && esCorrectoElDocumento(primeraParte)) {
+                        agregarArchivoLista(primeraParte);
+                    } else {
+                        leerInfoAdjunto((Multipart) primeraParte.getContent());
+                    }
+                } catch (ClassCastException | MessagingException | IOException ex) {
+                    /*ex.printStackTrace();
+                    String result = new BufferedReader(new InputStreamReader(primeraParte.getInputStream())).lines()
+                    .parallel().collect(Collectors.joining("\n"));
+                    System.out.println("RESULTADO: " + result);*/
+                } catch (Exception ex) {
+                    ex.printStackTrace();
                 }
-            } catch (ClassCastException | MessagingException ex) {
-                /*String result = new BufferedReader(new InputStreamReader(primeraParte.getInputStream())).lines()
-                        .parallel().collect(Collectors.joining("\n"));
-                System.out.println("RESULTADO: " + result);*/
-            } catch (IOException ex) {
-                Logger.getLogger(LectorEmail.class.getName()).log(Level.SEVERE, null, ex);
             }
+        } catch (MessagingException ex) {
+            ex.printStackTrace();
+            Logger.getLogger(LectorEmail.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 
     public boolean esCorrectoElDocumento(Part primeraParte) throws MessagingException {
         if ((esCorretoContenido(primeraParte) && EsCorrectoFormatoMIME(primeraParte)) && esNuloDisposition(primeraParte)) {
+            System.out.println("ES CORRECTO EL DOCUMENTO");
             return true;
         } else if (esCorretoContenido(primeraParte) && primeraParte.getDisposition().contains(Part.ATTACHMENT)) {
+            System.out.println("ES CORRECTO EL DOCUMENTO");
             return true;
         } else if (esCorrectoElNombre(primeraParte) && primeraParte.getDisposition().contains(Part.ATTACHMENT)) {
+            System.out.println("ES CORRECTO EL DOCUMENTO");
             return true;
         }
+        System.out.println("ES INCORRECTO EL DOCUMENTO");
         return false;
     }
 
@@ -269,9 +263,29 @@ public class LectorEmail extends Thread {
 
     public void agregarArchivoLista(Part archivoAdjunto) throws MessagingException {
         String nombreArchivo;
-        System.out.println("ARCHIVO NUMERO: " + (++cont));
         nombreArchivo = archivoAdjunto.getFileName().toLowerCase();
-        System.out.println("NOMBRE ARCHIVO: " + nombreArchivo);
-        archivos.add(archivoAdjunto);
+        if (nombreArchivo.endsWith(".xml")) {
+            System.out.println("ARCHIVO NUMERO: " + (++cont));
+            System.out.println("NOMBRE ARCHIVO: " + nombreArchivo);
+            archivos[0] = archivoAdjunto;
+        } else if(nombreArchivo.endsWith(".pdf")) {
+            System.out.println("ARCHIVO NUMERO: " + (++cont));
+            System.out.println("NOMBRE ARCHIVO: " + nombreArchivo);
+            archivos[1] = archivoAdjunto;
+        }
+
+    }
+
+    public void mostrarDetallesArchivoAdjunto(Part primeraParte) {
+        try {
+            System.out.println(primeraParte.getContentType());
+            System.out.println(primeraParte.getDescription());
+            System.out.println(primeraParte.getDisposition());
+            System.out.println(primeraParte.getFileName());
+            System.out.println(primeraParte.getLineCount());
+            System.out.println(primeraParte.getSize());
+        } catch (MessagingException ex) {
+            ex.printStackTrace();
+        }
     }
 }
